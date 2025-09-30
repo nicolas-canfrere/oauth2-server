@@ -1,0 +1,59 @@
+services:
+
+  nginx:
+    image: nginx:1.29-alpine3.22
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./:/app
+    ports:
+      - '8000:80'
+    depends_on:
+      - php
+
+  php:
+    image: oauth2-server:dev
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - ./:/app
+    working_dir: /app
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  database:
+    image: postgres:17-alpine3.22
+    environment:
+      POSTGRES_DB: oauth2
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "oauth2", "-U", "admin"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    ports:
+      - "9876:5432"
+
+  redis:
+    image: redis:8.2.1-alpine3.22
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - redis_data:/data:rw
+    ports:
+      - "9736:6379"
+
+volumes:
+  database_data:
+  redis_data:
