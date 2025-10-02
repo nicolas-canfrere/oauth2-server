@@ -28,17 +28,10 @@ final class AuthorizationCodeRepositoryTest extends KernelTestCase
         $container = static::getContainer();
         $this->connection = $container->get('doctrine.dbal.default_connection');
         $this->repository = new AuthorizationCodeRepository($this->connection);
-
-        // Clean the table before each test
-        $this->connection->executeStatement('TRUNCATE TABLE oauth_authorization_codes RESTART IDENTITY CASCADE');
     }
 
     protected function tearDown(): void
     {
-        // Clean up after each test
-        $this->connection->executeStatement('TRUNCATE TABLE oauth_authorization_codes RESTART IDENTITY CASCADE');
-
-        // Shutdown kernel
         self::ensureKernelShutdown();
     }
 

@@ -28,17 +28,10 @@ final class ClientRepositoryTest extends KernelTestCase
         $container = static::getContainer();
         $this->connection = $container->get('doctrine.dbal.default_connection');
         $this->repository = new ClientRepository($this->connection);
-
-        // Clean the table before each test
-        $this->connection->executeStatement('TRUNCATE TABLE oauth_clients RESTART IDENTITY CASCADE');
     }
 
     protected function tearDown(): void
     {
-        // Clean up after each test
-        $this->connection->executeStatement('TRUNCATE TABLE oauth_clients RESTART IDENTITY CASCADE');
-
-        // Shutdown kernel
         self::ensureKernelShutdown();
     }
 
