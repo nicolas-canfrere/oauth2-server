@@ -30,6 +30,7 @@ OAuth2 Server implementation using Symfony 7.3 and PHP 8.2+. Built with Doctrine
 - Code MUST follow the SOLID principles
 - Design patterns MUST BE used as often as possible (ex: factory, strategy, builder, adapter, decorator, ...)
 - PHPStan analyse MUST PASS
+- always favors DTOs , Models, Value Objects over arrays when it is possible.
 - Code as an PHP and Symfony Expert Senior Developper
 
 ## Development Commands
