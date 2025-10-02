@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Model\OAuthRefreshToken;
+use App\Service\TokenHasherInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
@@ -21,6 +22,7 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 
     public function __construct(
         private readonly Connection $connection,
+        private readonly TokenHasherInterface $tokenHasher,
     ) {
     }
 
@@ -31,7 +33,7 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     {
         $insertData = [
             'id' => $refreshToken->id,
-            'token' => $refreshToken->token,
+            'token_hash' => $this->tokenHasher->hash($refreshToken->token),
             'client_id' => $refreshToken->clientId,
             'user_id' => $refreshToken->userId,
             'scopes' => json_encode($refreshToken->scopes),
@@ -56,12 +58,14 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function findByToken(string $token): ?OAuthRefreshToken
     {
+        $tokenHash = $this->tokenHasher->hash($token);
+
         $queryBuilder = $this->connection->createQueryBuilder();
         $queryBuilder
             ->select('*')
             ->from(self::TABLE_NAME)
-            ->where('token = :token')
-            ->setParameter('token', $token);
+            ->where('token_hash = :token_hash')
+            ->setParameter('token_hash', $tokenHash);
 
         try {
             $result = $queryBuilder->executeQuery()->fetchAssociative();
@@ -70,7 +74,7 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
                 return null;
             }
 
-            return $this->hydrateRefreshToken($result);
+            return $this->hydrateRefreshToken($result, $token);
         } catch (Exception) {
             return null;
         }
@@ -81,6 +85,8 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function revoke(string $token): bool
     {
+        $tokenHash = $this->tokenHasher->hash($token);
+
         $updateData = [
             'is_revoked' => true,
         ];
@@ -93,7 +99,7 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             $affectedRows = $this->connection->update(
                 self::TABLE_NAME,
                 $updateData,
-                ['token' => $token],
+                ['token_hash' => $tokenHash],
                 $types
             );
 
@@ -124,7 +130,7 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             $results = $queryBuilder->executeQuery()->fetchAllAssociative();
 
             return array_map(
-                fn(array $row): OAuthRefreshToken => $this->hydrateRefreshToken($row),
+                fn(array $row): OAuthRefreshToken => $this->hydrateRefreshToken($row, '***REDACTED***'),
                 $results
             );
         } catch (Exception) {
@@ -154,10 +160,11 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      * Hydrate OAuthRefreshToken from database row.
      *
      * @param array<string, mixed> $row Database row
+     * @param string $plaintextToken Original plaintext token (not stored in DB)
      *
      * @throws \Exception
      */
-    private function hydrateRefreshToken(array $row): OAuthRefreshToken
+    private function hydrateRefreshToken(array $row, string $plaintextToken): OAuthRefreshToken
     {
         $scopes = is_string($row['scopes']) ? json_decode($row['scopes'], true) : $row['scopes'];
 
@@ -170,7 +177,7 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 
         return new OAuthRefreshToken(
             id: is_string($row['id']) ? $row['id'] : '',
-            token: is_string($row['token']) ? $row['token'] : '',
+            token: $plaintextToken,
             clientId: is_string($row['client_id']) ? $row['client_id'] : '',
             userId: is_string($row['user_id']) ? $row['user_id'] : '',
             scopes: $scopes,

@@ -6,7 +6,6 @@ namespace App\Tests\Repository;
 
 use App\Model\OAuthAuthorizationCode;
 use App\Repository\AuthorizationCodeRepository;
-use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -16,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 final class AuthorizationCodeRepositoryTest extends KernelTestCase
 {
-    private Connection $connection;
     private AuthorizationCodeRepository $repository;
 
     protected function setUp(): void
@@ -26,8 +24,7 @@ final class AuthorizationCodeRepositoryTest extends KernelTestCase
 
         // Get services from container
         $container = static::getContainer();
-        $this->connection = $container->get('doctrine.dbal.default_connection');
-        $this->repository = new AuthorizationCodeRepository($this->connection);
+        $this->repository = $container->get(AuthorizationCodeRepository::class);
     }
 
     protected function tearDown(): void

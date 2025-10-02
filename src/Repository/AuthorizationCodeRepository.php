@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Model\OAuthAuthorizationCode;
+use App\Service\TokenHasherInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 
@@ -20,6 +21,7 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
 
     public function __construct(
         private readonly Connection $connection,
+        private readonly TokenHasherInterface $tokenHasher,
     ) {
     }
 
@@ -30,7 +32,7 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
     {
         $insertData = [
             'id' => $authorizationCode->id,
-            'code' => $authorizationCode->code,
+            'code_hash' => $this->tokenHasher->hash($authorizationCode->code),
             'client_id' => $authorizationCode->clientId,
             'user_id' => $authorizationCode->userId,
             'redirect_uri' => $authorizationCode->redirectUri,
@@ -53,12 +55,14 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
      */
     public function findByCode(string $code): ?OAuthAuthorizationCode
     {
+        $codeHash = $this->tokenHasher->hash($code);
+
         $queryBuilder = $this->connection->createQueryBuilder();
         $queryBuilder
             ->select('*')
             ->from(self::TABLE_NAME)
-            ->where('code = :code')
-            ->setParameter('code', $code);
+            ->where('code_hash = :code_hash')
+            ->setParameter('code_hash', $codeHash);
 
         try {
             $result = $queryBuilder->executeQuery()->fetchAssociative();
@@ -67,7 +71,7 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
                 return null;
             }
 
-            return $this->hydrateAuthorizationCode($result);
+            return $this->hydrateAuthorizationCode($result, $code);
         } catch (Exception) {
             return null;
         }
@@ -78,10 +82,12 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
      */
     public function consume(string $code): bool
     {
+        $codeHash = $this->tokenHasher->hash($code);
+
         try {
             $affectedRows = $this->connection->delete(
                 self::TABLE_NAME,
-                ['code' => $code]
+                ['code_hash' => $codeHash]
             );
 
             return $affectedRows > 0;
@@ -112,10 +118,11 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
      * Hydrate OAuthAuthorizationCode from database row.
      *
      * @param array<string, mixed> $row Database row
+     * @param string $plaintextCode Original plaintext code (not stored in DB)
      *
      * @throws \Exception
      */
-    private function hydrateAuthorizationCode(array $row): OAuthAuthorizationCode
+    private function hydrateAuthorizationCode(array $row, string $plaintextCode): OAuthAuthorizationCode
     {
         $scopes = is_string($row['scopes']) ? json_decode($row['scopes'], true) : $row['scopes'];
 
@@ -128,7 +135,7 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
 
         return new OAuthAuthorizationCode(
             id: is_string($row['id']) ? $row['id'] : '',
-            code: is_string($row['code']) ? $row['code'] : '',
+            code: $plaintextCode,
             clientId: is_string($row['client_id']) ? $row['client_id'] : '',
             userId: is_string($row['user_id']) ? $row['user_id'] : '',
             redirectUri: is_string($row['redirect_uri']) ? $row['redirect_uri'] : '',

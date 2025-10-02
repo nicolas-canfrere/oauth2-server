@@ -6,7 +6,6 @@ namespace App\Tests\Repository;
 
 use App\Model\OAuthRefreshToken;
 use App\Repository\RefreshTokenRepository;
-use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -16,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 final class RefreshTokenRepositoryTest extends KernelTestCase
 {
-    private Connection $connection;
     private RefreshTokenRepository $repository;
 
     protected function setUp(): void
@@ -26,8 +24,7 @@ final class RefreshTokenRepositoryTest extends KernelTestCase
 
         // Get services from container
         $container = static::getContainer();
-        $this->connection = $container->get('doctrine.dbal.default_connection');
-        $this->repository = new RefreshTokenRepository($this->connection);
+        $this->repository = $container->get(RefreshTokenRepository::class);
     }
 
     protected function tearDown(): void
@@ -153,9 +150,13 @@ final class RefreshTokenRepositoryTest extends KernelTestCase
 
         $this->assertCount(2, $activeTokens);
 
-        // Verify tokens are sorted by created_at DESC
-        $this->assertSame('active_token_002', $activeTokens[0]->token);
-        $this->assertSame('active_token_001', $activeTokens[1]->token);
+        // Verify tokens are sorted by created_at DESC (check by ID since tokens are redacted)
+        $this->assertSame('323e4567-e89b-12d3-a456-426614174004', $activeTokens[0]->id);
+        $this->assertSame('323e4567-e89b-12d3-a456-426614174003', $activeTokens[1]->id);
+
+        // Note: token values are redacted in findActiveByUser() for security
+        $this->assertSame('***REDACTED***', $activeTokens[0]->token);
+        $this->assertSame('***REDACTED***', $activeTokens[1]->token);
     }
 
     public function testFindActiveByUserNoTokens(): void

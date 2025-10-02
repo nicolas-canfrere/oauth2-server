@@ -18,3 +18,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Token Hasher with APP_SECRET injection
+    App\Service\TokenHasher:
+        arguments:
+            $secret: '%env(APP_SECRET)%'

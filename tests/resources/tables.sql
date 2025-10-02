@@ -24,7 +24,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_clients_client_id ON oauth_clients (
 -- Table: oauth_authorization_codes
 CREATE TABLE IF NOT EXISTS oauth_authorization_codes (
     id UUID PRIMARY KEY,
-    code VARCHAR(255) NOT NULL,
+    code_hash VARCHAR(255) NOT NULL,
     client_id VARCHAR(255) NOT NULL,
     user_id VARCHAR(255) NOT NULL,
     redirect_uri VARCHAR(255) NOT NULL,
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS oauth_authorization_codes (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_authorization_codes_code
-    ON oauth_authorization_codes (code);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_authorization_codes_code_hash
+    ON oauth_authorization_codes (code_hash);
 
 CREATE INDEX IF NOT EXISTS idx_oauth_authorization_codes_expires_at
     ON oauth_authorization_codes (expires_at);
@@ -44,7 +44,7 @@ CREATE INDEX IF NOT EXISTS idx_oauth_authorization_codes_expires_at
 -- Table: oauth_refresh_tokens
 CREATE TABLE IF NOT EXISTS oauth_refresh_tokens (
     id UUID PRIMARY KEY,
-    token VARCHAR(255) NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
     client_id VARCHAR(255) NOT NULL,
     user_id VARCHAR(255) NOT NULL,
     scopes JSONB,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS oauth_refresh_tokens (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_refresh_tokens_token ON oauth_refresh_tokens (token);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_oauth_refresh_tokens_token_hash ON oauth_refresh_tokens (token_hash);
 CREATE INDEX IF NOT EXISTS idx_oauth_refresh_tokens_client_user_revoked ON oauth_refresh_tokens (client_id, user_id, is_revoked);
 CREATE INDEX IF NOT EXISTS idx_oauth_refresh_tokens_expires_at ON oauth_refresh_tokens (expires_at);
 
