@@ -3,7 +3,8 @@
     "allow": [
       "Bash(make migrations-generate:*)",
       "Bash(php:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(make:*)"
     ],
     "deny": [],
     "ask": []

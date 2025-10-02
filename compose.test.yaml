@@ -8,7 +8,29 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
+    environment:
+      APP_ENV: test
     env_file:
       - .env
-      - .env.dev
       - .env.test
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: postgres:17-alpine3.22
+    environment:
+      POSTGRES_DB: oauth2
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "oauth2", "-U", "admin"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - ./tests/resources/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+      - database_data:/var/lib/postgresql/data:rw
+
+volumes:
+  database_data:
