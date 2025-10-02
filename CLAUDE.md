@@ -167,12 +167,21 @@ This project uses **Doctrine DBAL exclusively** for database operations. We deli
 src/
 ├── Model/                    # Plain PHP readonly classes (no Doctrine annotations)
 │   ├── OAuthClient.php
-│   └── OAuthAuthorizationCode.php
-└── Repository/
-    ├── ClientRepositoryInterface.php
-    ├── ClientRepository.php            # DBAL implementation
-    ├── AuthorizationCodeRepositoryInterface.php
-    └── AuthorizationCodeRepository.php # DBAL implementation
+│   ├── OAuthAuthorizationCode.php
+│   ├── OAuthRefreshToken.php
+│   └── OAuthTokenBlacklist.php
+├── Repository/               # DBAL implementations with interfaces
+│   ├── ClientRepositoryInterface.php
+│   ├── ClientRepository.php
+│   ├── AuthorizationCodeRepositoryInterface.php
+│   ├── AuthorizationCodeRepository.php
+│   ├── RefreshTokenRepositoryInterface.php
+│   ├── RefreshTokenRepository.php
+│   ├── TokenBlacklistRepositoryInterface.php
+│   └── TokenBlacklistRepository.php
+└── Service/                  # Application services
+    ├── TokenHasherInterface.php
+    └── TokenHasher.php
 ```
 
 **Repository Guidelines:**
@@ -266,4 +275,64 @@ final class ClientRepositoryTest extends KernelTestCase
 - Test migrations in test environment before production
 - Use PostgreSQL-specific features (JSONB, UUID, partial indexes)
 - Include descriptive `getDescription()` method
+
+## Security Features
+
+### Token Hashing
+
+**All OAuth2 tokens (authorization codes, access tokens, refresh tokens) MUST be hashed before storage.**
+
+**Implementation:**
+- **Service**: `TokenHasher` implements `TokenHasherInterface`
+- **Algorithm**: SHA-256 hashing for secure token storage
+- **Usage**: Hash tokens before `save()`, compare hashed values on `find()`
+- **Tables**: All token tables store hashed values, never plain text
+- **Benefits**:
+  - Database breach protection: tokens cannot be extracted from database
+  - Compliance: Follows OAuth2 security best practices
+  - Performance: Fast hash comparison for token validation
+
+**Pattern:**
+```php
+// Hashing tokens before storage
+$hashedToken = $tokenHasher->hash($plainTextToken);
+$repository->save($entity->withHashedToken($hashedToken));
+
+// Validating tokens
+$hashedToken = $tokenHasher->hash($providedToken);
+$entity = $repository->findByHashedToken($hashedToken);
+```
+
+### Token Blacklist
+
+**Revoked tokens are stored in blacklist for security.**
+
+**Implementation:**
+- **Repository**: `TokenBlacklistRepository` with `TokenBlacklistRepositoryInterface`
+- **Model**: `OAuthTokenBlacklist` stores hashed tokens with revocation metadata
+- **Purpose**: Prevent reuse of revoked access/refresh tokens
+- **Strategy**: Check blacklist before token validation
+- **Cleanup**: Periodic removal of expired blacklisted tokens
+
+## Current Implementation Status
+
+**✅ Completed:**
+- Client management (ClientRepository)
+- Authorization code flow (AuthorizationCodeRepository)
+- Refresh token management (RefreshTokenRepository)
+- Token blacklist (TokenBlacklistRepository)
+- Token hashing security (TokenHasher)
+- Docker development environment
+- Test infrastructure with DAMA bundle
+
+**🔄 In Progress:**
+- Access token management
+- JWT token generation and validation
+- OAuth2 endpoint controllers
+
+**📋 Planned:**
+- Rate limiting with Redis
+- Scope management
+- Client credentials flow
+- PKCE support
 

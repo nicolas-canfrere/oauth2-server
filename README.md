@@ -5,10 +5,11 @@ OAuth2 Server implementation using Symfony 7.3 and PHP 8.2+.
 ## Tech Stack
 
 - **PHP**: 8.2+ with strict types
-- **Framework**: Symfony 7.3
+- **Framework**: Symfony 7.3 (MicroKernelTrait)
 - **Database**: PostgreSQL 17
 - **Cache/Rate Limiting**: Redis 8.2
-- **ORM**: Doctrine ORM 3.5
+- **Database Layer**: Doctrine DBAL 4.* (NO ORM - direct SQL with Query Builder)
+- **Migrations**: Doctrine Migrations 3.8
 - **Authentication**: JWT Framework (web-token/jwt-framework)
 - **Environment**: Docker-based development
 
@@ -97,9 +98,13 @@ bin/console
 │   ├── packages/          # Bundle configurations
 │   └── routes/            # Route definitions
 ├── docker/                # Docker configuration
+├── docs/                  # Project documentation
 ├── migrations/            # Doctrine migrations
 ├── public/                # Web root
 ├── src/                   # Application code (PSR-4: App\)
+│   ├── Model/            # Plain PHP readonly classes (no annotations)
+│   ├── Repository/       # DBAL repositories with interfaces
+│   ├── Service/          # Application services
 │   └── Kernel.php        # Application kernel
 ├── tests/                 # PHPUnit tests (PSR-4: App\Tests\)
 ├── var/                   # Cache, logs (gitignored)
@@ -132,6 +137,47 @@ All commands run inside Docker containers. Never run PHP/Composer commands direc
 - Health checks for database and redis
 - Persistent volumes for data
 
+## Architecture
+
+### DBAL-Only Pattern (No ORM)
+
+This project uses **Doctrine DBAL exclusively** for database operations:
+
+- All database access through `Doctrine\DBAL\Connection`
+- Repository pattern with explicit SQL via Query Builder
+- Models are plain PHP readonly classes (no Doctrine annotations)
+- No entity manager, no lazy loading, no automatic persistence
+- Manual hydration from database rows to Models
+- Application-managed UUIDs (generated before persistence)
+
+### Security Features
+
+**Token Hashing**: All OAuth2 tokens (authorization codes, access tokens, refresh tokens) are hashed using SHA-256 before storage for database breach protection.
+
+**Token Blacklist**: Revoked tokens are stored in a blacklist to prevent reuse of compromised tokens.
+
+### Implementation Status
+
+**✅ Completed:**
+- Client management (ClientRepository)
+- Authorization code flow (AuthorizationCodeRepository)
+- Refresh token management (RefreshTokenRepository)
+- Token blacklist (TokenBlacklistRepository)
+- Token hashing security (TokenHasher)
+- Docker development environment
+- Test infrastructure with DAMA bundle
+
+**🔄 In Progress:**
+- Access token management
+- JWT token generation and validation
+- OAuth2 endpoint controllers
+
+**📋 Planned:**
+- Rate limiting with Redis
+- Scope management
+- Client credentials flow
+- PKCE support
+
 ## Development Workflow
 
 1. Start environment: `make start`
@@ -142,6 +188,11 @@ All commands run inside Docker containers. Never run PHP/Composer commands direc
    - `make test`
 4. Generate migrations if needed: `make migrations-generate`
 5. Execute migrations: `make migrations-migrate`
+
+## Documentation
+
+- **CLAUDE.md**: Detailed guidance for AI-assisted development
+- **docs/**: Additional documentation and specifications
 
 ## License
 
