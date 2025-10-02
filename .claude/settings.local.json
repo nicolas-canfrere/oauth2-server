@@ -2,9 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(make migrations-generate:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "postgresql"
+  ]
 }
