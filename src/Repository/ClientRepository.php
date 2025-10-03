@@ -52,6 +52,31 @@ final class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritDoc}
      */
+    public function findByClientId(string $clientId): ?OAuthClient
+    {
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder
+            ->select('*')
+            ->from(self::TABLE_NAME)
+            ->where('client_id = :client_id')
+            ->setParameter('client_id', $clientId);
+
+        try {
+            $result = $queryBuilder->executeQuery()->fetchAssociative();
+
+            if (false === $result) {
+                return null;
+            }
+
+            return $this->hydrateClient($result);
+        } catch (Exception) {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function save(OAuthClient $client): void
     {
         $exists = $this->find($client->id);

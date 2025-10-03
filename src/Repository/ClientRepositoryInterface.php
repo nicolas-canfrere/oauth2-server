@@ -23,6 +23,18 @@ interface ClientRepositoryInterface
     public function find(string $id): ?OAuthClient;
 
     /**
+     * Find a client by its OAuth2 client_id (public identifier).
+     *
+     * This method is essential for OAuth2 flows where clients authenticate
+     * using their client_id, not the internal database UUID.
+     *
+     * @param string $clientId The OAuth2 client identifier
+     *
+     * @return OAuthClient|null Client object or null if not found
+     */
+    public function findByClientId(string $clientId): ?OAuthClient;
+
+    /**
      * Save an OAuth2 client (create or update).
      *
      * @param OAuthClient $client The client to save

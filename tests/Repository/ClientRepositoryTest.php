@@ -64,6 +64,60 @@ final class ClientRepositoryTest extends KernelTestCase
         $this->assertNull($result);
     }
 
+    public function testFindByClientId(): void
+    {
+        $client = $this->createTestClient(
+            id: '823e4567-e89b-12d3-a456-426614174008',
+            clientId: 'find_by_client_id_test',
+            name: 'Find By Client ID Test',
+        );
+
+        $this->repository->save($client);
+
+        $foundClient = $this->repository->findByClientId('find_by_client_id_test');
+
+        $this->assertNotNull($foundClient);
+        $this->assertSame('823e4567-e89b-12d3-a456-426614174008', $foundClient->id);
+        $this->assertSame('find_by_client_id_test', $foundClient->clientId);
+        $this->assertSame('Find By Client ID Test', $foundClient->name);
+    }
+
+    public function testFindByClientIdNonExistent(): void
+    {
+        $result = $this->repository->findByClientId('non_existent_client_id');
+
+        $this->assertNull($result);
+    }
+
+    public function testFindByClientIdWithMultipleClients(): void
+    {
+        // Create multiple clients
+        $client1 = $this->createTestClient(
+            id: '923e4567-e89b-12d3-a456-426614174009',
+            clientId: 'unique_client_1',
+            name: 'Client One',
+        );
+
+        $client2 = $this->createTestClient(
+            id: 'a23e4567-e89b-12d3-a456-42661417400a',
+            clientId: 'unique_client_2',
+            name: 'Client Two',
+        );
+
+        $this->repository->save($client1);
+        $this->repository->save($client2);
+
+        // Find each by clientId
+        $found1 = $this->repository->findByClientId('unique_client_1');
+        $found2 = $this->repository->findByClientId('unique_client_2');
+
+        $this->assertNotNull($found1);
+        $this->assertNotNull($found2);
+        $this->assertSame('923e4567-e89b-12d3-a456-426614174009', $found1->id);
+        $this->assertSame('a23e4567-e89b-12d3-a456-42661417400a', $found2->id);
+        $this->assertNotSame($found1->id, $found2->id);
+    }
+
     public function testUpdateClient(): void
     {
         $client = $this->createTestClient(
