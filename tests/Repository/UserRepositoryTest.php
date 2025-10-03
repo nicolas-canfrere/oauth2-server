@@ -1,0 +1,305 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Repository;
+
+use App\Model\User;
+use App\Repository\UserRepository;
+use Doctrine\DBAL\Connection;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
+/**
+ * Unit tests for UserRepository.
+ *
+ * Tests CRUD operations and authentication-related functionality using User model.
+ */
+final class UserRepositoryTest extends KernelTestCase
+{
+    private Connection $connection;
+    private UserRepository $repository;
+
+    protected function setUp(): void
+    {
+        // Boot Symfony kernel for test environment
+        self::bootKernel();
+
+        // Get services from container
+        $container = static::getContainer();
+        $this->connection = $container->get('doctrine.dbal.default_connection');
+        $this->repository = new UserRepository($this->connection);
+    }
+
+    protected function tearDown(): void
+    {
+        self::ensureKernelShutdown();
+    }
+
+    public function testSaveAndFindUser(): void
+    {
+        $user = $this->createTestUser(
+            id: '123e4567-e89b-12d3-a456-426614174001',
+            email: 'test@example.com',
+            passwordHash: password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '',
+        );
+
+        $this->repository->save($user);
+
+        $foundUser = $this->repository->find('123e4567-e89b-12d3-a456-426614174001');
+
+        $this->assertNotNull($foundUser);
+        $this->assertSame('123e4567-e89b-12d3-a456-426614174001', $foundUser->id);
+        $this->assertSame('test@example.com', $foundUser->email);
+        $this->assertTrue(password_verify('SecurePassword123!', $foundUser->passwordHash));
+        $this->assertFalse($foundUser->is2faEnabled);
+        $this->assertNull($foundUser->totpSecret);
+    }
+
+    public function testFindByEmail(): void
+    {
+        $user = $this->createTestUser(
+            id: '223e4567-e89b-12d3-a456-426614174002',
+            email: 'find-by-email@example.com',
+        );
+
+        $this->repository->save($user);
+
+        $foundUser = $this->repository->findByEmail('find-by-email@example.com');
+
+        $this->assertNotNull($foundUser);
+        $this->assertSame('223e4567-e89b-12d3-a456-426614174002', $foundUser->id);
+        $this->assertSame('find-by-email@example.com', $foundUser->email);
+    }
+
+    public function testFindByEmailNonExistent(): void
+    {
+        $result = $this->repository->findByEmail('nonexistent@example.com');
+
+        $this->assertNull($result);
+    }
+
+    public function testFindNonExistentUser(): void
+    {
+        $result = $this->repository->find('00000000-0000-0000-0000-000000000000');
+
+        $this->assertNull($result);
+    }
+
+    public function testUpdateUser(): void
+    {
+        $user = $this->createTestUser(
+            id: '323e4567-e89b-12d3-a456-426614174003',
+            email: 'original@example.com',
+            is2faEnabled: false,
+        );
+
+        $this->repository->save($user);
+
+        // Create updated version
+        $updatedUser = new User(
+            id: '323e4567-e89b-12d3-a456-426614174003',
+            email: 'updated@example.com',
+            passwordHash: $user->passwordHash,
+            is2faEnabled: true,
+            totpSecret: 'JBSWY3DPEHPK3PXP',
+            createdAt: $user->createdAt,
+        );
+
+        $this->repository->save($updatedUser);
+
+        $foundUser = $this->repository->find('323e4567-e89b-12d3-a456-426614174003');
+
+        $this->assertNotNull($foundUser);
+        $this->assertSame('updated@example.com', $foundUser->email);
+        $this->assertTrue($foundUser->is2faEnabled);
+        $this->assertSame('JBSWY3DPEHPK3PXP', $foundUser->totpSecret);
+    }
+
+    public function testUpdatePassword(): void
+    {
+        $user = $this->createTestUser(
+            id: '423e4567-e89b-12d3-a456-426614174004',
+            email: 'password-update@example.com',
+            passwordHash: password_hash('OldPassword123!', PASSWORD_BCRYPT) ?: '',
+        );
+
+        $this->repository->save($user);
+
+        // Update password
+        $newPasswordHash = password_hash('NewPassword456!', PASSWORD_BCRYPT) ?: '';
+        $this->repository->updatePassword('423e4567-e89b-12d3-a456-426614174004', $newPasswordHash);
+
+        $foundUser = $this->repository->find('423e4567-e89b-12d3-a456-426614174004');
+
+        $this->assertNotNull($foundUser);
+        $this->assertFalse(password_verify('OldPassword123!', $foundUser->passwordHash));
+        $this->assertTrue(password_verify('NewPassword456!', $foundUser->passwordHash));
+    }
+
+    public function testUpdatePasswordNonExistentUser(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('User with ID 00000000-0000-0000-0000-000000000000 not found');
+
+        $this->repository->updatePassword(
+            '00000000-0000-0000-0000-000000000000',
+            password_hash('NewPassword', PASSWORD_BCRYPT) ?: ''
+        );
+    }
+
+    public function testDeleteUser(): void
+    {
+        $user = $this->createTestUser(
+            id: '523e4567-e89b-12d3-a456-426614174005',
+            email: 'to-delete@example.com',
+        );
+
+        $this->repository->save($user);
+
+        $this->assertNotNull($this->repository->find('523e4567-e89b-12d3-a456-426614174005'));
+
+        $deleteResult = $this->repository->delete('523e4567-e89b-12d3-a456-426614174005');
+
+        $this->assertTrue($deleteResult);
+        $this->assertNull($this->repository->find('523e4567-e89b-12d3-a456-426614174005'));
+    }
+
+    public function testDeleteNonExistentUser(): void
+    {
+        $result = $this->repository->delete('00000000-0000-0000-0000-000000000000');
+
+        $this->assertFalse($result);
+    }
+
+    public function testUserWith2faEnabled(): void
+    {
+        $user = $this->createTestUser(
+            id: '623e4567-e89b-12d3-a456-426614174006',
+            email: '2fa-user@example.com',
+            is2faEnabled: true,
+            totpSecret: 'JBSWY3DPEHPK3PXP',
+        );
+
+        $this->repository->save($user);
+
+        $foundUser = $this->repository->find('623e4567-e89b-12d3-a456-426614174006');
+
+        $this->assertNotNull($foundUser);
+        $this->assertTrue($foundUser->is2faEnabled);
+        $this->assertSame('JBSWY3DPEHPK3PXP', $foundUser->totpSecret);
+    }
+
+    public function testUserWithoutTotpSecret(): void
+    {
+        $user = $this->createTestUser(
+            id: '723e4567-e89b-12d3-a456-426614174007',
+            email: 'no-totp@example.com',
+            is2faEnabled: false,
+            totpSecret: null,
+        );
+
+        $this->repository->save($user);
+
+        $foundUser = $this->repository->find('723e4567-e89b-12d3-a456-426614174007');
+
+        $this->assertNotNull($foundUser);
+        $this->assertFalse($foundUser->is2faEnabled);
+        $this->assertNull($foundUser->totpSecret);
+    }
+
+    public function testDuplicateEmailThrowsException(): void
+    {
+        $user1 = $this->createTestUser(
+            id: '823e4567-e89b-12d3-a456-426614174008',
+            email: 'duplicate@example.com',
+        );
+        $this->repository->save($user1);
+
+        $user2 = $this->createTestUser(
+            id: '823e4567-e89b-12d3-a456-426614174009',
+            email: 'duplicate@example.com',
+        );
+
+        // Database has unique constraint on email column
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Failed to create user');
+
+        $this->repository->save($user2);
+    }
+
+    public function testPasswordHashingWithBcrypt(): void
+    {
+        $plainPassword = 'MySecurePassword123!@#';
+        $passwordHash = password_hash($plainPassword, PASSWORD_BCRYPT) ?: '';
+
+        $user = $this->createTestUser(
+            id: '923e4567-e89b-12d3-a456-426614174010',
+            email: 'bcrypt-test@example.com',
+            passwordHash: $passwordHash,
+        );
+
+        $this->repository->save($user);
+
+        $foundUser = $this->repository->find('923e4567-e89b-12d3-a456-426614174010');
+
+        $this->assertNotNull($foundUser);
+        $this->assertTrue(password_verify($plainPassword, $foundUser->passwordHash));
+        $this->assertFalse(password_verify('WrongPassword', $foundUser->passwordHash));
+    }
+
+    public function testUpdatedAtTimestampChangesOnUpdate(): void
+    {
+        $user = $this->createTestUser(
+            id: 'a23e4567-e89b-12d3-a456-426614174011',
+            email: 'timestamp-test@example.com',
+        );
+
+        $this->repository->save($user);
+
+        $foundUser = $this->repository->find('a23e4567-e89b-12d3-a456-426614174011');
+        $this->assertNotNull($foundUser);
+        $originalUpdatedAt = $foundUser->updatedAt;
+
+        // Wait a moment to ensure timestamp difference
+        sleep(1);
+
+        // Update user
+        $updatedUser = new User(
+            id: 'a23e4567-e89b-12d3-a456-426614174011',
+            email: 'timestamp-updated@example.com',
+            passwordHash: $foundUser->passwordHash,
+            is2faEnabled: $foundUser->is2faEnabled,
+            totpSecret: $foundUser->totpSecret,
+            createdAt: $foundUser->createdAt,
+        );
+
+        $this->repository->save($updatedUser);
+
+        $refoundUser = $this->repository->find('a23e4567-e89b-12d3-a456-426614174011');
+        $this->assertNotNull($refoundUser);
+
+        // updatedAt should have changed
+        $this->assertNotEquals($originalUpdatedAt, $refoundUser->updatedAt);
+    }
+
+    private function createTestUser(
+        string $id = '00000000-0000-0000-0000-000000000001',
+        string $email = 'test@example.com',
+        string $passwordHash = '',
+        bool $is2faEnabled = false,
+        ?string $totpSecret = null,
+    ): User {
+        if ('' === $passwordHash) {
+            $passwordHash = password_hash('DefaultPassword123!', PASSWORD_BCRYPT) ?: '';
+        }
+
+        return new User(
+            id: $id,
+            email: $email,
+            passwordHash: $passwordHash,
+            is2faEnabled: $is2faEnabled,
+            totpSecret: $totpSecret,
+            createdAt: new \DateTimeImmutable(),
+        );
+    }
+}
