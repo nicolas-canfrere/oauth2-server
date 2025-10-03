@@ -46,7 +46,7 @@ final class SecurityControllerTest extends WebTestCase
             ->withPasswordHash($passwordHash)
             ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $this->client->request(
             'POST',
@@ -85,7 +85,7 @@ final class SecurityControllerTest extends WebTestCase
             ->withEmail('user@example.com')
             ->withPasswordHash($passwordHash)
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $this->client->request(
             'POST',
@@ -181,7 +181,7 @@ final class SecurityControllerTest extends WebTestCase
             ->withEmail('regular@example.com')
             ->withPasswordHash($passwordHash)
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $this->client->request(
             'POST',
@@ -218,7 +218,7 @@ final class SecurityControllerTest extends WebTestCase
             ->withPasswordHash($passwordHash)
             ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         // First login request
         $this->client->request(

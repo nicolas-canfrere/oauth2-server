@@ -35,13 +35,22 @@ interface ClientRepositoryInterface
     public function findByClientId(string $clientId): ?OAuthClient;
 
     /**
-     * Save an OAuth2 client (create or update).
+     * Create a new OAuth2 client.
      *
-     * @param OAuthClient $client The client to save
+     * @param OAuthClient $client The client to create
      *
-     * @throws \RuntimeException If save operation fails
+     * @throws \RuntimeException If client already exists or creation fails
      */
-    public function save(OAuthClient $client): void;
+    public function create(OAuthClient $client): void;
+
+    /**
+     * Update an existing OAuth2 client.
+     *
+     * @param OAuthClient $client The client to update
+     *
+     * @throws \RuntimeException If update operation fails
+     */
+    public function update(OAuthClient $client): void;
 
     /**
      * Delete an OAuth2 client.

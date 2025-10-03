@@ -77,14 +77,59 @@ final class UserRepository implements UserRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function save(User $user): void
+    public function create(User $user): void
     {
-        $exists = $this->find($user->id);
+        $insertData = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'password_hash' => $user->passwordHash,
+            'is_2fa_enabled' => $user->is2faEnabled,
+            'totp_secret' => $user->totpSecret,
+            'roles' => $user->roles,
+            'created_at' => $user->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $user->createdAt->format('Y-m-d H:i:s'),
+        ];
 
-        if (null === $exists) {
-            $this->insert($user);
-        } else {
-            $this->update($user);
+        $types = [
+            'is_2fa_enabled' => Types::BOOLEAN,
+            'roles' => Types::JSON,
+        ];
+
+        try {
+            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to create user: ' . $exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function update(User $user): void
+    {
+        $updateData = [
+            'email' => $user->email,
+            'password_hash' => $user->passwordHash,
+            'is_2fa_enabled' => $user->is2faEnabled,
+            'totp_secret' => $user->totpSecret,
+            'roles' => $user->roles,
+            'updated_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+        ];
+
+        $types = [
+            'is_2fa_enabled' => Types::BOOLEAN,
+            'roles' => Types::JSON,
+        ];
+
+        try {
+            $this->connection->update(
+                self::TABLE_NAME,
+                $updateData,
+                ['id' => $user->id],
+                $types
+            );
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to update user: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -127,65 +172,6 @@ final class UserRepository implements UserRepositoryInterface
             return $affectedRows > 0;
         } catch (Exception) {
             return false;
-        }
-    }
-
-    /**
-     * Insert a new user into the database.
-     */
-    private function insert(User $user): void
-    {
-        $insertData = [
-            'id' => $user->id,
-            'email' => $user->email,
-            'password_hash' => $user->passwordHash,
-            'is_2fa_enabled' => $user->is2faEnabled,
-            'totp_secret' => $user->totpSecret,
-            'roles' => $user->roles,
-            'created_at' => $user->createdAt->format('Y-m-d H:i:s'),
-            'updated_at' => $user->createdAt->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_2fa_enabled' => Types::BOOLEAN,
-            'roles' => Types::JSON,
-        ];
-
-        try {
-            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create user: ' . $exception->getMessage(), 0, $exception);
-        }
-    }
-
-    /**
-     * Update an existing user in the database.
-     */
-    private function update(User $user): void
-    {
-        $updateData = [
-            'email' => $user->email,
-            'password_hash' => $user->passwordHash,
-            'is_2fa_enabled' => $user->is2faEnabled,
-            'totp_secret' => $user->totpSecret,
-            'roles' => $user->roles,
-            'updated_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_2fa_enabled' => Types::BOOLEAN,
-            'roles' => Types::JSON,
-        ];
-
-        try {
-            $this->connection->update(
-                self::TABLE_NAME,
-                $updateData,
-                ['id' => $user->id],
-                $types
-            );
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update user: ' . $exception->getMessage(), 0, $exception);
         }
     }
 

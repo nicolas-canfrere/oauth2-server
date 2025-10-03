@@ -31,13 +31,22 @@ interface KeyRepositoryInterface
     public function findByKid(string $kid): ?OAuthKey;
 
     /**
-     * Save a cryptographic key (create or update).
+     * Create a new cryptographic key.
      *
-     * @param OAuthKey $key The key to save
+     * @param OAuthKey $key The key to create
      *
-     * @throws \RuntimeException If save operation fails
+     * @throws \RuntimeException If key already exists or creation fails
      */
-    public function save(OAuthKey $key): void;
+    public function create(OAuthKey $key): void;
+
+    /**
+     * Update an existing cryptographic key.
+     *
+     * @param OAuthKey $key The key to update
+     *
+     * @throws \RuntimeException If update operation fails
+     */
+    public function update(OAuthKey $key): void;
 
     /**
      * Deactivate a key by its Key ID.

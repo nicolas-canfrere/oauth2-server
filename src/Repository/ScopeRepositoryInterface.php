@@ -37,13 +37,22 @@ interface ScopeRepositoryInterface
     public function getDefaults(): array;
 
     /**
-     * Save an OAuth2 scope (create or update).
+     * Create a new OAuth2 scope.
      *
-     * @param OAuthScope $scope The scope to save
+     * @param OAuthScope $scope The scope to create
      *
-     * @throws \RuntimeException If save operation fails
+     * @throws \RuntimeException If scope already exists or creation fails
      */
-    public function save(OAuthScope $scope): void;
+    public function create(OAuthScope $scope): void;
+
+    /**
+     * Update an existing OAuth2 scope.
+     *
+     * @param OAuthScope $scope The scope to update
+     *
+     * @throws \RuntimeException If update operation fails
+     */
+    public function update(OAuthScope $scope): void;
 
     /**
      * Find a scope by its internal ID.

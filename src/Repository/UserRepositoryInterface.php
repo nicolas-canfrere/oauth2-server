@@ -32,13 +32,22 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?User;
 
     /**
-     * Save a user (create or update).
+     * Create a new user.
      *
-     * @param User $user The user to save
+     * @param User $user The user to create
      *
-     * @throws \RuntimeException If save operation fails
+     * @throws \RuntimeException If user already exists or creation fails
      */
-    public function save(User $user): void;
+    public function create(User $user): void;
+
+    /**
+     * Update an existing user.
+     *
+     * @param User $user The user to update
+     *
+     * @throws \RuntimeException If update operation fails
+     */
+    public function update(User $user): void;
 
     /**
      * Update user password.

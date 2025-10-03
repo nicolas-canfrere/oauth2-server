@@ -77,14 +77,57 @@ final class KeyRepository implements KeyRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function save(OAuthKey $key): void
+    public function create(OAuthKey $key): void
     {
-        $exists = $this->find($key->id);
+        $insertData = [
+            'id' => $key->id,
+            'kid' => $key->kid,
+            'algorithm' => $key->algorithm,
+            'public_key' => $key->publicKey,
+            'private_key_encrypted' => $key->privateKeyEncrypted,
+            'is_active' => $key->isActive,
+            'created_at' => $key->createdAt->format('Y-m-d H:i:s'),
+            'expires_at' => $key->expiresAt->format('Y-m-d H:i:s'),
+        ];
 
-        if (null === $exists) {
-            $this->insert($key);
-        } else {
-            $this->update($key);
+        $types = [
+            'is_active' => Types::BOOLEAN,
+        ];
+
+        try {
+            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to create OAuth2 key: ' . $exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function update(OAuthKey $key): void
+    {
+        $updateData = [
+            'kid' => $key->kid,
+            'algorithm' => $key->algorithm,
+            'public_key' => $key->publicKey,
+            'private_key_encrypted' => $key->privateKeyEncrypted,
+            'is_active' => $key->isActive,
+            'expires_at' => $key->expiresAt->format('Y-m-d H:i:s'),
+        ];
+
+        $types = [
+            'is_active' => Types::BOOLEAN,
+        ];
+
+        try {
+            $this->connection->update(
+                self::TABLE_NAME,
+                $updateData,
+                ['id' => $key->id],
+                $types
+            );
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to update OAuth2 key: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -155,63 +198,6 @@ final class KeyRepository implements KeyRepositoryInterface
             return $this->hydrateKey($result);
         } catch (Exception) {
             return null;
-        }
-    }
-
-    /**
-     * Insert a new key into the database.
-     */
-    private function insert(OAuthKey $key): void
-    {
-        $insertData = [
-            'id' => $key->id,
-            'kid' => $key->kid,
-            'algorithm' => $key->algorithm,
-            'public_key' => $key->publicKey,
-            'private_key_encrypted' => $key->privateKeyEncrypted,
-            'is_active' => $key->isActive,
-            'created_at' => $key->createdAt->format('Y-m-d H:i:s'),
-            'expires_at' => $key->expiresAt->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_active' => Types::BOOLEAN,
-        ];
-
-        try {
-            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create OAuth2 key: ' . $exception->getMessage(), 0, $exception);
-        }
-    }
-
-    /**
-     * Update an existing key in the database.
-     */
-    private function update(OAuthKey $key): void
-    {
-        $updateData = [
-            'kid' => $key->kid,
-            'algorithm' => $key->algorithm,
-            'public_key' => $key->publicKey,
-            'private_key_encrypted' => $key->privateKeyEncrypted,
-            'is_active' => $key->isActive,
-            'expires_at' => $key->expiresAt->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_active' => Types::BOOLEAN,
-        ];
-
-        try {
-            $this->connection->update(
-                self::TABLE_NAME,
-                $updateData,
-                ['id' => $key->id],
-                $types
-            );
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update OAuth2 key: ' . $exception->getMessage(), 0, $exception);
         }
     }
 

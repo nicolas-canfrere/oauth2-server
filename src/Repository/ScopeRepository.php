@@ -103,14 +103,51 @@ final class ScopeRepository implements ScopeRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function save(OAuthScope $scope): void
+    public function create(OAuthScope $scope): void
     {
-        $exists = $this->find($scope->id);
+        $insertData = [
+            'id' => $scope->id,
+            'scope' => $scope->scope,
+            'description' => $scope->description,
+            'is_default' => $scope->isDefault,
+            'created_at' => $scope->createdAt->format('Y-m-d H:i:s'),
+        ];
 
-        if (null === $exists) {
-            $this->insert($scope);
-        } else {
-            $this->update($scope);
+        $types = [
+            'is_default' => Types::BOOLEAN,
+        ];
+
+        try {
+            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to create OAuth2 scope: ' . $exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function update(OAuthScope $scope): void
+    {
+        $updateData = [
+            'scope' => $scope->scope,
+            'description' => $scope->description,
+            'is_default' => $scope->isDefault,
+        ];
+
+        $types = [
+            'is_default' => Types::BOOLEAN,
+        ];
+
+        try {
+            $this->connection->update(
+                self::TABLE_NAME,
+                $updateData,
+                ['id' => $scope->id],
+                $types
+            );
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to update OAuth2 scope: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -136,57 +173,6 @@ final class ScopeRepository implements ScopeRepositoryInterface
             return $this->hydrateScope($result);
         } catch (Exception) {
             return null;
-        }
-    }
-
-    /**
-     * Insert a new scope into the database.
-     */
-    private function insert(OAuthScope $scope): void
-    {
-        $insertData = [
-            'id' => $scope->id,
-            'scope' => $scope->scope,
-            'description' => $scope->description,
-            'is_default' => $scope->isDefault,
-            'created_at' => $scope->createdAt->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_default' => Types::BOOLEAN,
-        ];
-
-        try {
-            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create OAuth2 scope: ' . $exception->getMessage(), 0, $exception);
-        }
-    }
-
-    /**
-     * Update an existing scope in the database.
-     */
-    private function update(OAuthScope $scope): void
-    {
-        $updateData = [
-            'scope' => $scope->scope,
-            'description' => $scope->description,
-            'is_default' => $scope->isDefault,
-        ];
-
-        $types = [
-            'is_default' => Types::BOOLEAN,
-        ];
-
-        try {
-            $this->connection->update(
-                self::TABLE_NAME,
-                $updateData,
-                ['id' => $scope->id],
-                $types
-            );
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update OAuth2 scope: ' . $exception->getMessage(), 0, $exception);
         }
     }
 

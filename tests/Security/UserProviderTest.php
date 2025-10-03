@@ -46,7 +46,7 @@ final class UserProviderTest extends KernelTestCase
             ->withEmail('test@example.com')
             ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('test@example.com');
 
@@ -70,7 +70,7 @@ final class UserProviderTest extends KernelTestCase
             ->withId('223e4567-e89b-12d3-a456-426614174002')
             ->withEmail('refresh@example.com')
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $originalSecurityUser = $this->userProvider->loadUserByIdentifier('refresh@example.com');
 
@@ -84,7 +84,7 @@ final class UserProviderTest extends KernelTestCase
             roles: ['ROLE_USER', 'ROLE_ADMIN'],
             createdAt: $user->createdAt,
         );
-        $this->userRepository->save($updatedUser);
+        $this->userRepository->update($updatedUser);
 
         // Refresh should reload from database
         $refreshedSecurityUser = $this->userProvider->refreshUser($originalSecurityUser);
@@ -122,7 +122,7 @@ final class UserProviderTest extends KernelTestCase
             ->withEmail('password@example.com')
             ->withPasswordHash($passwordHash)
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('password@example.com');
 
@@ -138,7 +138,7 @@ final class UserProviderTest extends KernelTestCase
             ->with2faEnabled(true)
             ->withTotpSecret('JBSWY3DPEHPK3PXP')
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('2fa@example.com');
 
@@ -152,7 +152,7 @@ final class UserProviderTest extends KernelTestCase
             ->withEmail('multi-role@example.com')
             ->withRoles(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_OAUTH_CLIENT'])
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('multi-role@example.com');
 
@@ -169,7 +169,7 @@ final class UserProviderTest extends KernelTestCase
             ->withId('623e4567-e89b-12d3-a456-426614174006')
             ->withEmail('deleted@example.com')
             ->build();
-        $this->userRepository->save($user);
+        $this->userRepository->create($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('deleted@example.com');
 

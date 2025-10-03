@@ -35,7 +35,7 @@ final class ScopeRepositoryTest extends KernelTestCase
         self::ensureKernelShutdown();
     }
 
-    public function testSaveAndFindScope(): void
+    public function testCreateAndFindScope(): void
     {
         $scope = $this->createTestScope(
             id: '123e4567-e89b-12d3-a456-426614174001',
@@ -44,7 +44,7 @@ final class ScopeRepositoryTest extends KernelTestCase
             isDefault: true,
         );
 
-        $this->repository->save($scope);
+        $this->repository->create($scope);
 
         $foundScope = $this->repository->find('123e4567-e89b-12d3-a456-426614174001');
 
@@ -71,7 +71,7 @@ final class ScopeRepositoryTest extends KernelTestCase
             isDefault: false,
         );
 
-        $this->repository->save($scope);
+        $this->repository->create($scope);
 
         // Create updated version
         $updatedScope = new OAuthScope(
@@ -82,7 +82,7 @@ final class ScopeRepositoryTest extends KernelTestCase
             createdAt: $scope->createdAt,
         );
 
-        $this->repository->save($updatedScope);
+        $this->repository->update($updatedScope);
 
         $foundScope = $this->repository->find('223e4567-e89b-12d3-a456-426614174002');
 
@@ -106,7 +106,7 @@ final class ScopeRepositoryTest extends KernelTestCase
                 scope: $scopeData['scope'],
                 description: $scopeData['description'],
             );
-            $this->repository->save($scope);
+            $this->repository->create($scope);
         }
 
         $allScopes = $this->repository->findAll();
@@ -133,7 +133,7 @@ final class ScopeRepositoryTest extends KernelTestCase
                 scope: $scopeData['scope'],
                 description: $scopeData['description'],
             );
-            $this->repository->save($scope);
+            $this->repository->create($scope);
         }
 
         // Find specific scopes
@@ -160,7 +160,7 @@ final class ScopeRepositoryTest extends KernelTestCase
             scope: 'existing:scope',
             description: 'Existing scope',
         );
-        $this->repository->save($scope);
+        $this->repository->create($scope);
 
         $foundScopes = $this->repository->findByScopes(['non:existent', 'also:missing']);
 
@@ -183,7 +183,7 @@ final class ScopeRepositoryTest extends KernelTestCase
                 description: "Description for {$scopeData['scope']}",
                 isDefault: $scopeData['isDefault'],
             );
-            $this->repository->save($scope);
+            $this->repository->create($scope);
         }
 
         $defaultScopes = $this->repository->getDefaults();
@@ -208,7 +208,7 @@ final class ScopeRepositoryTest extends KernelTestCase
             description: 'Non-default scope',
             isDefault: false,
         );
-        $this->repository->save($scope);
+        $this->repository->create($scope);
 
         $defaultScopes = $this->repository->getDefaults();
 
@@ -224,7 +224,7 @@ final class ScopeRepositoryTest extends KernelTestCase
             description: 'First instance',
             isDefault: true,
         );
-        $this->repository->save($scope1);
+        $this->repository->create($scope1);
 
         // Attempt to save different scope with same name (different ID)
         $scope2 = $this->createTestScope(
@@ -238,7 +238,7 @@ final class ScopeRepositoryTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to create OAuth2 scope');
 
-        $this->repository->save($scope2);
+        $this->repository->create($scope2);
     }
 
     private function createTestScope(

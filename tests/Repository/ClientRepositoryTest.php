@@ -35,7 +35,7 @@ final class ClientRepositoryTest extends KernelTestCase
         self::ensureKernelShutdown();
     }
 
-    public function testSaveAndFindClient(): void
+    public function testCreateAndFindClient(): void
     {
         $client = $this->createTestClient(
             id: '123e4567-e89b-12d3-a456-426614174001',
@@ -43,7 +43,7 @@ final class ClientRepositoryTest extends KernelTestCase
             name: 'Test Application',
         );
 
-        $this->repository->save($client);
+        $this->repository->create($client);
 
         $foundClient = $this->repository->find('123e4567-e89b-12d3-a456-426614174001');
 
@@ -72,7 +72,7 @@ final class ClientRepositoryTest extends KernelTestCase
             name: 'Find By Client ID Test',
         );
 
-        $this->repository->save($client);
+        $this->repository->create($client);
 
         $foundClient = $this->repository->findByClientId('find_by_client_id_test');
 
@@ -104,8 +104,8 @@ final class ClientRepositoryTest extends KernelTestCase
             name: 'Client Two',
         );
 
-        $this->repository->save($client1);
-        $this->repository->save($client2);
+        $this->repository->create($client1);
+        $this->repository->create($client2);
 
         // Find each by clientId
         $found1 = $this->repository->findByClientId('unique_client_1');
@@ -127,7 +127,7 @@ final class ClientRepositoryTest extends KernelTestCase
             scopes: ['read'],
         );
 
-        $this->repository->save($client);
+        $this->repository->create($client);
 
         // Create updated version
         $updatedClient = new OAuthClient(
@@ -143,7 +143,7 @@ final class ClientRepositoryTest extends KernelTestCase
             createdAt: $client->createdAt,
         );
 
-        $this->repository->save($updatedClient);
+        $this->repository->update($updatedClient);
 
         $foundClient = $this->repository->find('223e4567-e89b-12d3-a456-426614174002');
 
@@ -161,7 +161,7 @@ final class ClientRepositoryTest extends KernelTestCase
             name: 'To Be Deleted',
         );
 
-        $this->repository->save($client);
+        $this->repository->create($client);
 
         $this->assertNotNull($this->repository->find('323e4567-e89b-12d3-a456-426614174003'));
 
@@ -186,7 +186,7 @@ final class ClientRepositoryTest extends KernelTestCase
                 clientId: "client_{$i}",
                 name: "Client {$i}",
             );
-            $this->repository->save($client);
+            $this->repository->create($client);
         }
 
         $allClients = $this->repository->findAll();
@@ -202,7 +202,7 @@ final class ClientRepositoryTest extends KernelTestCase
                 clientId: "paginated_client_{$i}",
                 name: "Paginated Client {$i}",
             );
-            $this->repository->save($client);
+            $this->repository->create($client);
         }
 
         $firstPage = $this->repository->findAll(5, 0);
@@ -226,7 +226,7 @@ final class ClientRepositoryTest extends KernelTestCase
             pkceRequired: true,
         );
 
-        $this->repository->save($client);
+        $this->repository->create($client);
 
         $retrievedClient = $this->repository->find('623e4567-e89b-12d3-a456-426614174006');
 
@@ -247,7 +247,7 @@ final class ClientRepositoryTest extends KernelTestCase
             scopes: [],
         );
 
-        $this->repository->save($client);
+        $this->repository->create($client);
 
         $retrievedClient = $this->repository->find('723e4567-e89b-12d3-a456-426614174007');
 

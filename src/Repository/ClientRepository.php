@@ -77,14 +77,65 @@ final class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function save(OAuthClient $client): void
+    public function create(OAuthClient $client): void
     {
-        $exists = $this->find($client->id);
+        $insertData = [
+            'id' => $client->id,
+            'client_id' => $client->clientId,
+            'client_secret_hash' => $client->clientSecretHash,
+            'name' => $client->name,
+            'redirect_uri' => $client->redirectUri,
+            'grant_types' => json_encode($client->grantTypes),
+            'scopes' => json_encode($client->scopes),
+            'is_confidential' => $client->isConfidential,
+            'pkce_required' => $client->pkceRequired,
+            'created_at' => $client->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $client->createdAt->format('Y-m-d H:i:s'),
+        ];
 
-        if (null === $exists) {
-            $this->insert($client);
-        } else {
-            $this->update($client);
+        $types = [
+            'is_confidential' => Types::BOOLEAN,
+            'pkce_required' => Types::BOOLEAN,
+        ];
+
+        try {
+            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to create OAuth2 client: ' . $exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function update(OAuthClient $client): void
+    {
+        $updateData = [
+            'client_id' => $client->clientId,
+            'client_secret_hash' => $client->clientSecretHash,
+            'name' => $client->name,
+            'redirect_uri' => $client->redirectUri,
+            'grant_types' => json_encode($client->grantTypes),
+            'scopes' => json_encode($client->scopes),
+            'is_confidential' => $client->isConfidential,
+            'pkce_required' => $client->pkceRequired,
+            'updated_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+        ];
+
+        $types = [
+            'is_confidential' => Types::BOOLEAN,
+            'pkce_required' => Types::BOOLEAN,
+        ];
+
+        try {
+            $this->connection->update(
+                self::TABLE_NAME,
+                $updateData,
+                ['id' => $client->id],
+                $types
+            );
+        } catch (Exception $exception) {
+            throw new \RuntimeException('Failed to update OAuth2 client: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -127,71 +178,6 @@ final class ClientRepository implements ClientRepositoryInterface
             );
         } catch (Exception) {
             return [];
-        }
-    }
-
-    /**
-     * Insert a new client into the database.
-     */
-    private function insert(OAuthClient $client): void
-    {
-        $insertData = [
-            'id' => $client->id,
-            'client_id' => $client->clientId,
-            'client_secret_hash' => $client->clientSecretHash,
-            'name' => $client->name,
-            'redirect_uri' => $client->redirectUri,
-            'grant_types' => json_encode($client->grantTypes),
-            'scopes' => json_encode($client->scopes),
-            'is_confidential' => $client->isConfidential,
-            'pkce_required' => $client->pkceRequired,
-            'created_at' => $client->createdAt->format('Y-m-d H:i:s'),
-            'updated_at' => $client->createdAt->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_confidential' => Types::BOOLEAN,
-            'pkce_required' => Types::BOOLEAN,
-        ];
-
-        try {
-            $this->connection->insert(self::TABLE_NAME, $insertData, $types);
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create OAuth2 client: ' . $exception->getMessage(), 0, $exception);
-        }
-    }
-
-    /**
-     * Update an existing client in the database.
-     */
-    private function update(OAuthClient $client): void
-    {
-        $updateData = [
-            'client_id' => $client->clientId,
-            'client_secret_hash' => $client->clientSecretHash,
-            'name' => $client->name,
-            'redirect_uri' => $client->redirectUri,
-            'grant_types' => json_encode($client->grantTypes),
-            'scopes' => json_encode($client->scopes),
-            'is_confidential' => $client->isConfidential,
-            'pkce_required' => $client->pkceRequired,
-            'updated_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
-        ];
-
-        $types = [
-            'is_confidential' => Types::BOOLEAN,
-            'pkce_required' => Types::BOOLEAN,
-        ];
-
-        try {
-            $this->connection->update(
-                self::TABLE_NAME,
-                $updateData,
-                ['id' => $client->id],
-                $types
-            );
-        } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update OAuth2 client: ' . $exception->getMessage(), 0, $exception);
         }
     }
 

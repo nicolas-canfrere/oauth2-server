@@ -38,7 +38,7 @@ final class UserRepositoryTest extends KernelTestCase
         self::ensureKernelShutdown();
     }
 
-    public function testSaveAndFindUser(): void
+    public function testCreateAndFindUser(): void
     {
         $user = UserBuilder::aUser()
             ->withId('123e4567-e89b-12d3-a456-426614174001')
@@ -46,7 +46,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withPasswordHash(password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $foundUser = $this->repository->find('123e4567-e89b-12d3-a456-426614174001');
 
@@ -65,7 +65,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withEmail('find-by-email@example.com')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $foundUser = $this->repository->findByEmail('find-by-email@example.com');
 
@@ -95,7 +95,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withEmail('original@example.com')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         // Create updated version
         $updatedUser = new User(
@@ -108,7 +108,7 @@ final class UserRepositoryTest extends KernelTestCase
             createdAt: $user->createdAt,
         );
 
-        $this->repository->save($updatedUser);
+        $this->repository->update($updatedUser);
 
         $foundUser = $this->repository->find('323e4567-e89b-12d3-a456-426614174003');
 
@@ -126,7 +126,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withPasswordHash(password_hash('OldPassword123!', PASSWORD_BCRYPT) ?: '')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         // Update password
         $newPasswordHash = password_hash('NewPassword456!', PASSWORD_BCRYPT) ?: '';
@@ -157,7 +157,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withEmail('to-delete@example.com')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $this->assertNotNull($this->repository->find('523e4567-e89b-12d3-a456-426614174005'));
 
@@ -183,7 +183,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withTotpSecret('JBSWY3DPEHPK3PXP')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $foundUser = $this->repository->find('623e4567-e89b-12d3-a456-426614174006');
 
@@ -199,7 +199,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withEmail('no-totp@example.com')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $foundUser = $this->repository->find('723e4567-e89b-12d3-a456-426614174007');
 
@@ -214,7 +214,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withId('823e4567-e89b-12d3-a456-426614174008')
             ->withEmail('duplicate@example.com')
             ->build();
-        $this->repository->save($user1);
+        $this->repository->create($user1);
 
         $user2 = UserBuilder::aUser()
             ->withId('823e4567-e89b-12d3-a456-426614174009')
@@ -225,7 +225,7 @@ final class UserRepositoryTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to create user');
 
-        $this->repository->save($user2);
+        $this->repository->create($user2);
     }
 
     public function testPasswordHashingWithBcrypt(): void
@@ -239,7 +239,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withPasswordHash($passwordHash)
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $foundUser = $this->repository->find('923e4567-e89b-12d3-a456-426614174010');
 
@@ -255,7 +255,7 @@ final class UserRepositoryTest extends KernelTestCase
             ->withEmail('timestamp-test@example.com')
             ->build();
 
-        $this->repository->save($user);
+        $this->repository->create($user);
 
         $foundUser = $this->repository->find('a23e4567-e89b-12d3-a456-426614174011');
         $this->assertNotNull($foundUser);
@@ -275,7 +275,7 @@ final class UserRepositoryTest extends KernelTestCase
             createdAt: $foundUser->createdAt,
         );
 
-        $this->repository->save($updatedUser);
+        $this->repository->update($updatedUser);
 
         $refoundUser = $this->repository->find('a23e4567-e89b-12d3-a456-426614174011');
         $this->assertNotNull($refoundUser);

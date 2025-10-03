@@ -35,7 +35,7 @@ final class KeyRepositoryTest extends KernelTestCase
         self::ensureKernelShutdown();
     }
 
-    public function testSaveAndFindKey(): void
+    public function testCreateAndFindKey(): void
     {
         $key = $this->createTestKey(
             id: '123e4567-e89b-12d3-a456-426614174001',
@@ -46,7 +46,7 @@ final class KeyRepositoryTest extends KernelTestCase
             isActive: true,
         );
 
-        $this->repository->save($key);
+        $this->repository->create($key);
 
         $foundKey = $this->repository->find('123e4567-e89b-12d3-a456-426614174001');
 
@@ -66,7 +66,7 @@ final class KeyRepositoryTest extends KernelTestCase
             kid: 'key-2025-01-002',
         );
 
-        $this->repository->save($key);
+        $this->repository->create($key);
 
         $foundKey = $this->repository->findByKid('key-2025-01-002');
 
@@ -98,7 +98,7 @@ final class KeyRepositoryTest extends KernelTestCase
             isActive: true,
         );
 
-        $this->repository->save($key);
+        $this->repository->create($key);
 
         // Update key
         $updatedKey = new OAuthKey(
@@ -112,7 +112,7 @@ final class KeyRepositoryTest extends KernelTestCase
             expiresAt: (new \DateTimeImmutable())->modify('+180 days'),
         );
 
-        $this->repository->save($updatedKey);
+        $this->repository->update($updatedKey);
 
         $foundKey = $this->repository->find('323e4567-e89b-12d3-a456-426614174003');
 
@@ -136,7 +136,7 @@ final class KeyRepositoryTest extends KernelTestCase
                 kid: $keyData['kid'],
                 isActive: $keyData['isActive'],
             );
-            $this->repository->save($key);
+            $this->repository->create($key);
         }
 
         $foundActiveKeys = $this->repository->findActiveKeys();
@@ -161,7 +161,7 @@ final class KeyRepositoryTest extends KernelTestCase
             kid: 'key-inactive-only',
             isActive: false,
         );
-        $this->repository->save($key);
+        $this->repository->create($key);
 
         $activeKeys = $this->repository->findActiveKeys();
 
@@ -176,7 +176,7 @@ final class KeyRepositoryTest extends KernelTestCase
             isActive: true,
         );
 
-        $this->repository->save($key);
+        $this->repository->create($key);
 
         $this->assertTrue($this->repository->findByKid('key-to-deactivate')?->isActive);
 
@@ -209,14 +209,14 @@ final class KeyRepositoryTest extends KernelTestCase
             createdAt: (new \DateTimeImmutable())->modify('-180 days'),
             expiresAt: (new \DateTimeImmutable())->modify('-1 day'),
         );
-        $this->repository->save($expiredKey);
+        $this->repository->create($expiredKey);
 
         // Create valid key
         $validKey = $this->createTestKey(
             id: '823e4567-e89b-12d3-a456-426614174010',
             kid: 'key-valid',
         );
-        $this->repository->save($validKey);
+        $this->repository->create($validKey);
 
         // Delete expired keys
         $deletedCount = $this->repository->deleteExpired();
@@ -236,7 +236,7 @@ final class KeyRepositoryTest extends KernelTestCase
             id: '923e4567-e89b-12d3-a456-426614174011',
             kid: 'key-not-expired',
         );
-        $this->repository->save($key);
+        $this->repository->create($key);
 
         $deletedCount = $this->repository->deleteExpired();
 
@@ -258,7 +258,7 @@ final class KeyRepositoryTest extends KernelTestCase
                 kid: $algData['kid'],
                 algorithm: $algData['algorithm'],
             );
-            $this->repository->save($key);
+            $this->repository->create($key);
         }
 
         $rs256Key = $this->repository->findByKid('key-rs256');
@@ -279,7 +279,7 @@ final class KeyRepositoryTest extends KernelTestCase
             kid: 'key-2025-01-old',
             isActive: true,
         );
-        $this->repository->save($oldKey);
+        $this->repository->create($oldKey);
 
         // Step 2: Create new key and activate it
         $newKey = $this->createTestKey(
@@ -287,7 +287,7 @@ final class KeyRepositoryTest extends KernelTestCase
             kid: 'key-2025-02-new',
             isActive: true,
         );
-        $this->repository->save($newKey);
+        $this->repository->create($newKey);
 
         // Step 3: Deactivate old key
         $this->repository->deactivate('key-2025-01-old');
@@ -309,7 +309,7 @@ final class KeyRepositoryTest extends KernelTestCase
             id: 'c23e4567-e89b-12d3-a456-426614174018',
             kid: 'duplicate-kid',
         );
-        $this->repository->save($key1);
+        $this->repository->create($key1);
 
         $key2 = $this->createTestKey(
             id: 'c23e4567-e89b-12d3-a456-426614174019',
@@ -320,7 +320,7 @@ final class KeyRepositoryTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to create OAuth2 key');
 
-        $this->repository->save($key2);
+        $this->repository->create($key2);
     }
 
     private function createTestKey(
