@@ -88,9 +88,12 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     totp_secret VARCHAR(255),
     is_2fa_enabled BOOLEAN DEFAULT false,
+    roles JSONB NOT NULL DEFAULT '["ROLE_USER"]'::jsonb,
     updated_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
+
+COMMENT ON COLUMN users.roles IS 'User roles for Symfony Security (JSONB array)';
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users (email);
 

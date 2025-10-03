@@ -141,12 +141,14 @@ final class UserRepository implements UserRepositoryInterface
             'password_hash' => $user->passwordHash,
             'is_2fa_enabled' => $user->is2faEnabled,
             'totp_secret' => $user->totpSecret,
+            'roles' => $user->roles,
             'created_at' => $user->createdAt->format('Y-m-d H:i:s'),
             'updated_at' => $user->createdAt->format('Y-m-d H:i:s'),
         ];
 
         $types = [
             'is_2fa_enabled' => Types::BOOLEAN,
+            'roles' => Types::JSON,
         ];
 
         try {
@@ -166,11 +168,13 @@ final class UserRepository implements UserRepositoryInterface
             'password_hash' => $user->passwordHash,
             'is_2fa_enabled' => $user->is2faEnabled,
             'totp_secret' => $user->totpSecret,
+            'roles' => $user->roles,
             'updated_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
         ];
 
         $types = [
             'is_2fa_enabled' => Types::BOOLEAN,
+            'roles' => Types::JSON,
         ];
 
         try {
@@ -194,12 +198,31 @@ final class UserRepository implements UserRepositoryInterface
      */
     private function hydrateUser(array $row): User
     {
+        $rolesJson = $row['roles'] ?? '[]';
+        if (!\is_string($rolesJson)) {
+            throw new \RuntimeException('roles column must be a string');
+        }
+
+        $roles = json_decode($rolesJson, true, flags: JSON_THROW_ON_ERROR);
+        if (!\is_array($roles)) {
+            throw new \RuntimeException('roles must be a JSON array');
+        }
+
+        /** @var array<string> $rolesTyped */
+        $rolesTyped = array_filter(array_map(static function (mixed $role): ?string {
+            if (\is_string($role)) {
+                return $role;
+            }
+            return null;
+        }, $roles));
+
         return new User(
             id: is_string($row['id']) ? $row['id'] : '',
             email: is_string($row['email']) ? $row['email'] : '',
             passwordHash: is_string($row['password_hash']) ? $row['password_hash'] : '',
             is2faEnabled: (bool) $row['is_2fa_enabled'],
             totpSecret: isset($row['totp_secret']) && is_string($row['totp_secret']) ? $row['totp_secret'] : null,
+            roles: $rolesTyped,
             createdAt: new \DateTimeImmutable(is_string($row['created_at']) ? $row['created_at'] : 'now'),
             updatedAt: isset($row['updated_at']) && is_string($row['updated_at']) ? new \DateTimeImmutable($row['updated_at']) : null,
         );

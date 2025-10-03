@@ -1,29 +1,68 @@
 security:
+    # Password hashing configuration
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: bcrypt
+            cost: 12
+
+    # User providers
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            id: App\Security\UserProvider
+
+    # Firewalls
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
+        # OAuth2 endpoints firewall
+        oauth:
+            pattern: ^/oauth
+            stateless: true
+            provider: app_user_provider
+            # OAuth2 endpoints use client authentication, not user authentication
+
+        # Admin interface firewall
+        admin:
+            pattern: ^/admin
+            lazy: true
+            stateless: false
+            provider: app_user_provider
+            json_login:
+                check_path: admin_login
+                username_path: email
+                password_path: password
+            logout:
+                path: admin_logout
+
+        # API firewall (protected by OAuth2 tokens)
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            # Will be configured with JWT authentication later
+
+        # Main firewall
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Easy way to control access for large sections of your site
+    # Access control
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # OAuth2 token endpoint is public
+        - { path: ^/oauth/token, roles: PUBLIC_ACCESS }
+        # OAuth2 authorize endpoint requires authentication
+        - { path: ^/oauth/authorize, roles: ROLE_USER }
+        # Admin login is public
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+        # Admin area requires ROLE_ADMIN
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # API requires authentication (will be refined later)
+        - { path: ^/api, roles: ROLE_USER }
 
 when@test:
     security:

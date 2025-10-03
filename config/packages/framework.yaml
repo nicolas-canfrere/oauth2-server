@@ -2,8 +2,14 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
+    # Session configuration with Redis handler
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    session:
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+        cookie_secure: auto
+        cookie_httponly: true
+        cookie_samesite: lax
+        gc_maxlifetime: 3600  # 1 hour session timeout
 
     #esi: true
     #fragments: true

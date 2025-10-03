@@ -7,6 +7,7 @@ namespace App\Tests\Repository;
 use App\Model\User;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -14,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  *
  * Tests CRUD operations and authentication-related functionality using User model.
  */
+#[Group('user')]
 final class UserRepositoryTest extends KernelTestCase
 {
     private Connection $connection;
@@ -102,6 +104,7 @@ final class UserRepositoryTest extends KernelTestCase
             passwordHash: $user->passwordHash,
             is2faEnabled: true,
             totpSecret: 'JBSWY3DPEHPK3PXP',
+            roles: $user->roles,
             createdAt: $user->createdAt,
         );
 
@@ -270,6 +273,7 @@ final class UserRepositoryTest extends KernelTestCase
             passwordHash: $foundUser->passwordHash,
             is2faEnabled: $foundUser->is2faEnabled,
             totpSecret: $foundUser->totpSecret,
+            roles: $foundUser->roles,
             createdAt: $foundUser->createdAt,
         );
 
@@ -282,12 +286,16 @@ final class UserRepositoryTest extends KernelTestCase
         $this->assertNotEquals($originalUpdatedAt, $refoundUser->updatedAt);
     }
 
+    /**
+     * @param array<string> $roles
+     */
     private function createTestUser(
         string $id = '00000000-0000-0000-0000-000000000001',
         string $email = 'test@example.com',
         string $passwordHash = '',
         bool $is2faEnabled = false,
         ?string $totpSecret = null,
+        array $roles = ['ROLE_USER'],
     ): User {
         if ('' === $passwordHash) {
             $passwordHash = password_hash('DefaultPassword123!', PASSWORD_BCRYPT) ?: '';
@@ -299,6 +307,7 @@ final class UserRepositoryTest extends KernelTestCase
             passwordHash: $passwordHash,
             is2faEnabled: $is2faEnabled,
             totpSecret: $totpSecret,
+            roles: $roles,
             createdAt: new \DateTimeImmutable(),
         );
     }
