@@ -6,6 +6,7 @@ namespace App\Tests\Repository;
 
 use App\Model\User;
 use App\Repository\UserRepository;
+use App\Tests\Helper\UserBuilder;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -39,11 +40,11 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testSaveAndFindUser(): void
     {
-        $user = $this->createTestUser(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash(password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '')
+            ->build();
 
         $this->repository->save($user);
 
@@ -59,10 +60,10 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testFindByEmail(): void
     {
-        $user = $this->createTestUser(
-            id: '223e4567-e89b-12d3-a456-426614174002',
-            email: 'find-by-email@example.com',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('223e4567-e89b-12d3-a456-426614174002')
+            ->withEmail('find-by-email@example.com')
+            ->build();
 
         $this->repository->save($user);
 
@@ -89,11 +90,10 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testUpdateUser(): void
     {
-        $user = $this->createTestUser(
-            id: '323e4567-e89b-12d3-a456-426614174003',
-            email: 'original@example.com',
-            is2faEnabled: false,
-        );
+        $user = UserBuilder::aUser()
+            ->withId('323e4567-e89b-12d3-a456-426614174003')
+            ->withEmail('original@example.com')
+            ->build();
 
         $this->repository->save($user);
 
@@ -120,11 +120,11 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testUpdatePassword(): void
     {
-        $user = $this->createTestUser(
-            id: '423e4567-e89b-12d3-a456-426614174004',
-            email: 'password-update@example.com',
-            passwordHash: password_hash('OldPassword123!', PASSWORD_BCRYPT) ?: '',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('423e4567-e89b-12d3-a456-426614174004')
+            ->withEmail('password-update@example.com')
+            ->withPasswordHash(password_hash('OldPassword123!', PASSWORD_BCRYPT) ?: '')
+            ->build();
 
         $this->repository->save($user);
 
@@ -152,10 +152,10 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testDeleteUser(): void
     {
-        $user = $this->createTestUser(
-            id: '523e4567-e89b-12d3-a456-426614174005',
-            email: 'to-delete@example.com',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('523e4567-e89b-12d3-a456-426614174005')
+            ->withEmail('to-delete@example.com')
+            ->build();
 
         $this->repository->save($user);
 
@@ -176,12 +176,12 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testUserWith2faEnabled(): void
     {
-        $user = $this->createTestUser(
-            id: '623e4567-e89b-12d3-a456-426614174006',
-            email: '2fa-user@example.com',
-            is2faEnabled: true,
-            totpSecret: 'JBSWY3DPEHPK3PXP',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('623e4567-e89b-12d3-a456-426614174006')
+            ->withEmail('2fa-user@example.com')
+            ->with2faEnabled(true)
+            ->withTotpSecret('JBSWY3DPEHPK3PXP')
+            ->build();
 
         $this->repository->save($user);
 
@@ -194,12 +194,10 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testUserWithoutTotpSecret(): void
     {
-        $user = $this->createTestUser(
-            id: '723e4567-e89b-12d3-a456-426614174007',
-            email: 'no-totp@example.com',
-            is2faEnabled: false,
-            totpSecret: null,
-        );
+        $user = UserBuilder::aUser()
+            ->withId('723e4567-e89b-12d3-a456-426614174007')
+            ->withEmail('no-totp@example.com')
+            ->build();
 
         $this->repository->save($user);
 
@@ -212,16 +210,16 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testDuplicateEmailThrowsException(): void
     {
-        $user1 = $this->createTestUser(
-            id: '823e4567-e89b-12d3-a456-426614174008',
-            email: 'duplicate@example.com',
-        );
+        $user1 = UserBuilder::aUser()
+            ->withId('823e4567-e89b-12d3-a456-426614174008')
+            ->withEmail('duplicate@example.com')
+            ->build();
         $this->repository->save($user1);
 
-        $user2 = $this->createTestUser(
-            id: '823e4567-e89b-12d3-a456-426614174009',
-            email: 'duplicate@example.com',
-        );
+        $user2 = UserBuilder::aUser()
+            ->withId('823e4567-e89b-12d3-a456-426614174009')
+            ->withEmail('duplicate@example.com')
+            ->build();
 
         // Database has unique constraint on email column
         $this->expectException(\RuntimeException::class);
@@ -235,11 +233,11 @@ final class UserRepositoryTest extends KernelTestCase
         $plainPassword = 'MySecurePassword123!@#';
         $passwordHash = password_hash($plainPassword, PASSWORD_BCRYPT) ?: '';
 
-        $user = $this->createTestUser(
-            id: '923e4567-e89b-12d3-a456-426614174010',
-            email: 'bcrypt-test@example.com',
-            passwordHash: $passwordHash,
-        );
+        $user = UserBuilder::aUser()
+            ->withId('923e4567-e89b-12d3-a456-426614174010')
+            ->withEmail('bcrypt-test@example.com')
+            ->withPasswordHash($passwordHash)
+            ->build();
 
         $this->repository->save($user);
 
@@ -252,10 +250,10 @@ final class UserRepositoryTest extends KernelTestCase
 
     public function testUpdatedAtTimestampChangesOnUpdate(): void
     {
-        $user = $this->createTestUser(
-            id: 'a23e4567-e89b-12d3-a456-426614174011',
-            email: 'timestamp-test@example.com',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('a23e4567-e89b-12d3-a456-426614174011')
+            ->withEmail('timestamp-test@example.com')
+            ->build();
 
         $this->repository->save($user);
 
@@ -284,31 +282,5 @@ final class UserRepositoryTest extends KernelTestCase
 
         // updatedAt should have changed
         $this->assertNotEquals($originalUpdatedAt, $refoundUser->updatedAt);
-    }
-
-    /**
-     * @param array<string> $roles
-     */
-    private function createTestUser(
-        string $id = '00000000-0000-0000-0000-000000000001',
-        string $email = 'test@example.com',
-        string $passwordHash = '',
-        bool $is2faEnabled = false,
-        ?string $totpSecret = null,
-        array $roles = ['ROLE_USER'],
-    ): User {
-        if ('' === $passwordHash) {
-            $passwordHash = password_hash('DefaultPassword123!', PASSWORD_BCRYPT) ?: '';
-        }
-
-        return new User(
-            id: $id,
-            email: $email,
-            passwordHash: $passwordHash,
-            is2faEnabled: $is2faEnabled,
-            totpSecret: $totpSecret,
-            roles: $roles,
-            createdAt: new \DateTimeImmutable(),
-        );
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Security;
 
-use App\Model\User;
 use App\Security\SecurityUser;
+use App\Tests\Helper\UserBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,15 +17,12 @@ final class SecurityUserTest extends TestCase
 {
     public function testFromUserCreatesSecurityUser(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER', 'ROLE_ADMIN'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
 
@@ -38,15 +35,12 @@ final class SecurityUserTest extends TestCase
 
     public function testGetRolesAlwaysIncludesRoleUser(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_ADMIN'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->withRoles(['ROLE_ADMIN'])
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
         $roles = $securityUser->getRoles();
@@ -57,15 +51,12 @@ final class SecurityUserTest extends TestCase
 
     public function testGetRolesReturnsUniqueValues(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_USER'])
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
         $roles = $securityUser->getRoles();
@@ -78,15 +69,11 @@ final class SecurityUserTest extends TestCase
 
     public function testGetUserIdentifierReturnsEmail(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'user@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('user@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
 
@@ -97,15 +84,11 @@ final class SecurityUserTest extends TestCase
     {
         $passwordHash = password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '';
 
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: $passwordHash,
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash($passwordHash)
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
 
@@ -115,15 +98,11 @@ final class SecurityUserTest extends TestCase
 
     public function testEraseCredentialsDoesNothing(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
         $passwordBefore = $securityUser->getPassword();
@@ -136,15 +115,11 @@ final class SecurityUserTest extends TestCase
 
     public function testFromUserWithDefaultRole(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
 
@@ -153,15 +128,12 @@ final class SecurityUserTest extends TestCase
 
     public function testFromUserWithMultipleRoles(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'admin@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_OAUTH_CLIENT'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('admin@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_OAUTH_CLIENT'])
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
         $roles = $securityUser->getRoles();
@@ -174,15 +146,12 @@ final class SecurityUserTest extends TestCase
 
     public function testFromUserPreservesValidRoles(): void
     {
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            passwordHash: '$2y$10$abcdefghijklmnopqrstuv',
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER', 'ROLE_ADMIN'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withPasswordHash('$2y$10$abcdefghijklmnopqrstuv')
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
+            ->build();
 
         $securityUser = SecurityUser::fromUser($user);
         $roles = $securityUser->getRoles();

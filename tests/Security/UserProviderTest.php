@@ -8,6 +8,7 @@ use App\Model\User;
 use App\Repository\UserRepository;
 use App\Security\SecurityUser;
 use App\Security\UserProvider;
+use App\Tests\Helper\UserBuilder;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -40,11 +41,11 @@ final class UserProviderTest extends KernelTestCase
 
     public function testLoadUserByIdentifierFindsUser(): void
     {
-        $user = $this->createTestUser(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'test@example.com',
-            roles: ['ROLE_USER', 'ROLE_ADMIN'],
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('test@example.com')
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
+            ->build();
         $this->userRepository->save($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('test@example.com');
@@ -65,11 +66,10 @@ final class UserProviderTest extends KernelTestCase
 
     public function testRefreshUserReloadsUserFromDatabase(): void
     {
-        $user = $this->createTestUser(
-            id: '223e4567-e89b-12d3-a456-426614174002',
-            email: 'refresh@example.com',
-            roles: ['ROLE_USER'],
-        );
+        $user = UserBuilder::aUser()
+            ->withId('223e4567-e89b-12d3-a456-426614174002')
+            ->withEmail('refresh@example.com')
+            ->build();
         $this->userRepository->save($user);
 
         $originalSecurityUser = $this->userProvider->loadUserByIdentifier('refresh@example.com');
@@ -117,11 +117,11 @@ final class UserProviderTest extends KernelTestCase
     {
         $passwordHash = password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '';
 
-        $user = $this->createTestUser(
-            id: '323e4567-e89b-12d3-a456-426614174003',
-            email: 'password@example.com',
-            passwordHash: $passwordHash,
-        );
+        $user = UserBuilder::aUser()
+            ->withId('323e4567-e89b-12d3-a456-426614174003')
+            ->withEmail('password@example.com')
+            ->withPasswordHash($passwordHash)
+            ->build();
         $this->userRepository->save($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('password@example.com');
@@ -132,12 +132,12 @@ final class UserProviderTest extends KernelTestCase
 
     public function testLoadUserByIdentifierWith2faEnabled(): void
     {
-        $user = $this->createTestUser(
-            id: '423e4567-e89b-12d3-a456-426614174004',
-            email: '2fa@example.com',
-            is2faEnabled: true,
-            totpSecret: 'JBSWY3DPEHPK3PXP',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('423e4567-e89b-12d3-a456-426614174004')
+            ->withEmail('2fa@example.com')
+            ->with2faEnabled(true)
+            ->withTotpSecret('JBSWY3DPEHPK3PXP')
+            ->build();
         $this->userRepository->save($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('2fa@example.com');
@@ -147,11 +147,11 @@ final class UserProviderTest extends KernelTestCase
 
     public function testLoadUserByIdentifierHandlesMultipleRoles(): void
     {
-        $user = $this->createTestUser(
-            id: '523e4567-e89b-12d3-a456-426614174005',
-            email: 'multi-role@example.com',
-            roles: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_OAUTH_CLIENT'],
-        );
+        $user = UserBuilder::aUser()
+            ->withId('523e4567-e89b-12d3-a456-426614174005')
+            ->withEmail('multi-role@example.com')
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_OAUTH_CLIENT'])
+            ->build();
         $this->userRepository->save($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('multi-role@example.com');
@@ -165,10 +165,10 @@ final class UserProviderTest extends KernelTestCase
 
     public function testRefreshUserThrowsExceptionWhenUserNoLongerExists(): void
     {
-        $user = $this->createTestUser(
-            id: '623e4567-e89b-12d3-a456-426614174006',
-            email: 'deleted@example.com',
-        );
+        $user = UserBuilder::aUser()
+            ->withId('623e4567-e89b-12d3-a456-426614174006')
+            ->withEmail('deleted@example.com')
+            ->build();
         $this->userRepository->save($user);
 
         $securityUser = $this->userProvider->loadUserByIdentifier('deleted@example.com');
@@ -180,31 +180,5 @@ final class UserProviderTest extends KernelTestCase
         $this->expectExceptionMessage('User "deleted@example.com" not found.');
 
         $this->userProvider->refreshUser($securityUser);
-    }
-
-    /**
-     * @param array<string> $roles
-     */
-    private function createTestUser(
-        string $id = '00000000-0000-0000-0000-000000000001',
-        string $email = 'test@example.com',
-        string $passwordHash = '',
-        bool $is2faEnabled = false,
-        ?string $totpSecret = null,
-        array $roles = ['ROLE_USER'],
-    ): User {
-        if ('' === $passwordHash) {
-            $passwordHash = password_hash('DefaultPassword123!', PASSWORD_BCRYPT) ?: '';
-        }
-
-        return new User(
-            id: $id,
-            email: $email,
-            passwordHash: $passwordHash,
-            is2faEnabled: $is2faEnabled,
-            totpSecret: $totpSecret,
-            roles: $roles,
-            createdAt: new \DateTimeImmutable(),
-        );
     }
 }

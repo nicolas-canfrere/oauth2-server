@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Model\User;
 use App\Repository\UserRepository;
+use App\Tests\Helper\UserBuilder;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -40,15 +40,12 @@ final class SecurityControllerTest extends WebTestCase
     {
         $passwordHash = password_hash('SecurePassword123!', PASSWORD_BCRYPT) ?: '';
 
-        $user = new User(
-            id: '123e4567-e89b-12d3-a456-426614174001',
-            email: 'admin@example.com',
-            passwordHash: $passwordHash,
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER', 'ROLE_ADMIN'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('123e4567-e89b-12d3-a456-426614174001')
+            ->withEmail('admin@example.com')
+            ->withPasswordHash($passwordHash)
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
+            ->build();
         $this->userRepository->save($user);
 
         $this->client->request(
@@ -83,15 +80,11 @@ final class SecurityControllerTest extends WebTestCase
     {
         $passwordHash = password_hash('CorrectPassword123!', PASSWORD_BCRYPT) ?: '';
 
-        $user = new User(
-            id: '223e4567-e89b-12d3-a456-426614174002',
-            email: 'user@example.com',
-            passwordHash: $passwordHash,
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('223e4567-e89b-12d3-a456-426614174002')
+            ->withEmail('user@example.com')
+            ->withPasswordHash($passwordHash)
+            ->build();
         $this->userRepository->save($user);
 
         $this->client->request(
@@ -183,15 +176,11 @@ final class SecurityControllerTest extends WebTestCase
     {
         $passwordHash = password_hash('UserPassword123!', PASSWORD_BCRYPT) ?: '';
 
-        $user = new User(
-            id: '323e4567-e89b-12d3-a456-426614174003',
-            email: 'regular@example.com',
-            passwordHash: $passwordHash,
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('323e4567-e89b-12d3-a456-426614174003')
+            ->withEmail('regular@example.com')
+            ->withPasswordHash($passwordHash)
+            ->build();
         $this->userRepository->save($user);
 
         $this->client->request(
@@ -223,15 +212,12 @@ final class SecurityControllerTest extends WebTestCase
     {
         $passwordHash = password_hash('SessionTest123!', PASSWORD_BCRYPT) ?: '';
 
-        $user = new User(
-            id: '423e4567-e89b-12d3-a456-426614174004',
-            email: 'session@example.com',
-            passwordHash: $passwordHash,
-            is2faEnabled: false,
-            totpSecret: null,
-            roles: ['ROLE_USER', 'ROLE_ADMIN'],
-            createdAt: new \DateTimeImmutable(),
-        );
+        $user = UserBuilder::aUser()
+            ->withId('423e4567-e89b-12d3-a456-426614174004')
+            ->withEmail('session@example.com')
+            ->withPasswordHash($passwordHash)
+            ->withRoles(['ROLE_USER', 'ROLE_ADMIN'])
+            ->build();
         $this->userRepository->save($user);
 
         // First login request
