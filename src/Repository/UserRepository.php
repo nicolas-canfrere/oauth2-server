@@ -213,6 +213,7 @@ final class UserRepository implements UserRepositoryInterface
             if (\is_string($role)) {
                 return $role;
             }
+
             return null;
         }, $roles));
 

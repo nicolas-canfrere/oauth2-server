@@ -25,6 +25,7 @@ OAuth2 Server implementation using Symfony 7.3 and PHP 8.2+. Built with Doctrine
 - Enum names MUST BE ALWAYS SUFFIXED WITH "Enum"
 - Trait names MUST BE ALWAYS SUFFIXED WITH "Trait"
 - Abstract class names MUST BE ALWAYS PREFIXED WITH "Abstract"
+- DTO class names MUST BE ALWAYS SUFFIXED WITH "DTO"
 - Variable and function names ALWAYS in camel case
 - Code MUST follow PSR-12 coding standards and Symfony coding standards (see @docs/symfony_coding_standards.md)
 - PSR-12 coding standards and Symfony coding standards can be fixed with PHP CS Fixer

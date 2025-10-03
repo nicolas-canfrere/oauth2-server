@@ -4,7 +4,9 @@
       "Bash(make migrations-generate:*)",
       "Bash(php:*)",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "mcp__context7__get-library-docs",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
