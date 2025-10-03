@@ -6,7 +6,8 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(make:*)",
       "mcp__context7__get-library-docs",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

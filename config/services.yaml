@@ -39,3 +39,11 @@ services:
             - connect:
                 - '%env(REDIS_HOST)%'
                 - '%env(int:REDIS_PORT)%'
+
+    # Rate Limiter Service with whitelist configuration
+    App\Service\RateLimiter\RateLimiterService:
+        arguments:
+            $oauthTokenLimiter: '@limiter.oauth_token'
+            $loginLimiter: '@limiter.login'
+            $globalIpLimiter: '@limiter.global_ip'
+            $whitelistedIpsString: '%env(RATE_LIMITER_WHITELIST_IPS)%'
