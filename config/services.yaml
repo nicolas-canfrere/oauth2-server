@@ -47,3 +47,13 @@ services:
             $loginLimiter: '@limiter.login'
             $globalIpLimiter: '@limiter.global_ip'
             $whitelistedIpsString: '%env(RATE_LIMITER_WHITELIST_IPS)%'
+
+    # Audit Logger with dedicated Monolog channel
+    App\Service\AuditLogger:
+        arguments:
+            $auditLogger: '@monolog.logger.audit'
+
+    # Audit Log Cleanup Command with configurable retention
+    App\Command\AuditLogCleanupCommand:
+        arguments:
+            $defaultRetentionDays: '%env(int:AUDIT_LOG_RETENTION_DAYS)%'
