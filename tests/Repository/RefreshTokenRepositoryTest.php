@@ -97,12 +97,14 @@ final class RefreshTokenRepositoryTest extends KernelTestCase
     public function testFindActiveByUser(): void
     {
         // Create active tokens for user_123
+        // Note: Explicit createdAt timestamps to ensure deterministic ordering (DESC by created_at)
         $activeToken1 = $this->createTestRefreshToken(
             id: '323e4567-e89b-12d3-a456-426614174003',
             token: 'active_token_001',
             userId: 'user_123',
             isRevoked: false,
             expiresAt: new \DateTimeImmutable('+30 days'),
+            createdAt: new \DateTimeImmutable('2025-01-01 10:00:00'),
         );
 
         $activeToken2 = $this->createTestRefreshToken(
@@ -111,6 +113,7 @@ final class RefreshTokenRepositoryTest extends KernelTestCase
             userId: 'user_123',
             isRevoked: false,
             expiresAt: new \DateTimeImmutable('+15 days'),
+            createdAt: new \DateTimeImmutable('2025-01-01 10:00:01'),
         );
 
         // Create revoked token for user_123 (should not be returned)
