@@ -170,7 +170,8 @@ src/
 │   ├── OAuthClient.php
 │   ├── OAuthAuthorizationCode.php
 │   ├── OAuthRefreshToken.php
-│   └── OAuthTokenBlacklist.php
+│   ├── OAuthTokenBlacklist.php
+│   └── OAuthAuditLog.php
 ├── Repository/               # DBAL implementations with interfaces
 │   ├── ClientRepositoryInterface.php
 │   ├── ClientRepository.php
@@ -179,10 +180,20 @@ src/
 │   ├── RefreshTokenRepositoryInterface.php
 │   ├── RefreshTokenRepository.php
 │   ├── TokenBlacklistRepositoryInterface.php
-│   └── TokenBlacklistRepository.php
-└── Service/                  # Application services
-    ├── TokenHasherInterface.php
-    └── TokenHasher.php
+│   ├── TokenBlacklistRepository.php
+│   ├── AuditLogRepositoryInterface.php
+│   └── AuditLogRepository.php
+├── Service/                  # Application services
+│   ├── TokenHasherInterface.php
+│   ├── TokenHasher.php
+│   ├── AuditLoggerInterface.php
+│   └── AuditLogger.php
+├── DTO/                      # Data Transfer Objects
+│   └── AuditEventDTO.php
+├── Enum/                     # Enumerations
+│   └── AuditEventTypeEnum.php
+└── Command/                  # Console commands
+    └── AuditLogCleanupCommand.php
 ```
 
 **Repository Guidelines:**
@@ -315,6 +326,80 @@ $entity = $repository->findByHashedToken($hashedToken);
 - **Strategy**: Check blacklist before token validation
 - **Cleanup**: Periodic removal of expired blacklisted tokens
 
+### Audit Logging
+
+**All security-relevant OAuth2 events MUST be logged for compliance and security analysis.**
+
+**Implementation:**
+- **Service**: `AuditLogger` implements `AuditLoggerInterface` with dedicated Monolog channel
+- **Repository**: `AuditLogRepository` with `AuditLogRepositoryInterface` for DBAL operations
+- **Model**: `OAuthAuditLog` immutable value object for audit records
+- **DTO**: `AuditEventDTO` with factory methods for type-safe event creation
+- **Enum**: `AuditEventTypeEnum` defines all trackable OAuth2 security events
+- **Storage**: PostgreSQL `oauth_audit_logs` table with optimized indexes
+- **Retention**: Configurable via `AUDIT_LOG_RETENTION_DAYS` environment variable (default: 90 days)
+- **Cleanup**: `AuditLogCleanupCommand` for automated log rotation (run via CRON)
+
+**Logged Events:**
+- Authentication: login success/failure
+- Token issuance: access tokens, refresh tokens, authorization codes
+- Token revocation: access/refresh token revocation
+- Client management: client created/updated/deleted
+- Security events: rate limits, invalid credentials, suspicious activity
+
+**Usage Pattern:**
+```php
+// Log successful login
+$auditLogger->logEvent(
+    AuditEventDTO::loginSuccess($userId, $ipAddress, $userAgent)
+);
+
+// Log token issuance
+$auditLogger->logEvent(
+    AuditEventDTO::accessTokenIssued($userId, $clientId, $jti, $scopes, $ipAddress)
+);
+
+// Log security event
+$auditLogger->logEvent(
+    AuditEventDTO::rateLimitExceeded($limiterName, $ipAddress, $userId)
+);
+```
+
+**Log Format:**
+- JSON-formatted logs to `var/log/audit.log` (dev/test) or `php://stderr` (production)
+- Structured fields: event_type, level, message, context, user_id, client_id, ip_address, user_agent, timestamp
+- Monolog integration with dedicated `audit` channel for separation from application logs
+
+**Querying Audit Logs:**
+```php
+// Find by user
+$logs = $auditLogRepository->findByUserId($userId, limit: 100);
+
+// Find by client
+$logs = $auditLogRepository->findByClientId($clientId, limit: 100);
+
+// Find by event type
+$logs = $auditLogRepository->findByEventType(AuditEventTypeEnum::LOGIN_FAILURE);
+
+// Find by date range
+$logs = $auditLogRepository->findByDateRange($startDate, $endDate);
+```
+
+**Maintenance:**
+```bash
+# Run cleanup manually
+bin/console audit:cleanup
+
+# Dry-run to preview deletion
+bin/console audit:cleanup --dry-run
+
+# Custom retention period
+bin/console audit:cleanup --days=30
+
+# Recommended CRON schedule (daily at 3 AM)
+0 3 * * * php bin/console audit:cleanup
+```
+
 ## Current Implementation Status
 
 **✅ Completed:**
@@ -323,6 +408,8 @@ $entity = $repository->findByHashedToken($hashedToken);
 - Refresh token management (RefreshTokenRepository)
 - Token blacklist (TokenBlacklistRepository)
 - Token hashing security (TokenHasher)
+- Audit logging system (AuditLogger, AuditLogRepository)
+- Audit log cleanup automation (AuditLogCleanupCommand)
 - Docker development environment
 - Test infrastructure with DAMA bundle
 
