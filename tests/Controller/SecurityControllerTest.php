@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Enum\AuditEventTypeEnum;
+use App\Repository\AuditLogRepository;
 use App\Repository\UserRepository;
 use App\Tests\Helper\UserBuilder;
 use Doctrine\DBAL\Connection;
@@ -21,6 +23,7 @@ final class SecurityControllerTest extends WebTestCase
     private KernelBrowser $client;
     private Connection $connection;
     private UserRepository $userRepository;
+    private AuditLogRepository $auditLogRepository;
 
     protected function setUp(): void
     {
@@ -29,6 +32,7 @@ final class SecurityControllerTest extends WebTestCase
         $container = static::getContainer();
         $this->connection = $container->get('doctrine.dbal.default_connection');
         $this->userRepository = new UserRepository($this->connection);
+        $this->auditLogRepository = new AuditLogRepository($this->connection);
     }
 
     protected function tearDown(): void
@@ -74,6 +78,24 @@ final class SecurityControllerTest extends WebTestCase
         $this->assertSame('admin@example.com', $responseData['user']['email']);
         $this->assertContains('ROLE_USER', $responseData['user']['roles']);
         $this->assertContains('ROLE_ADMIN', $responseData['user']['roles']);
+
+        // Verify audit log was created for successful login
+        $auditLogs = $this->auditLogRepository->findByUserId('123e4567-e89b-12d3-a456-426614174001');
+        $this->assertNotEmpty($auditLogs, 'Audit log should be created for successful login');
+
+        $loginSuccessLog = null;
+        foreach ($auditLogs as $log) {
+            if (AuditEventTypeEnum::LOGIN_SUCCESS === $log->eventType) {
+                $loginSuccessLog = $log;
+                break;
+            }
+        }
+
+        $this->assertNotNull($loginSuccessLog, 'LOGIN_SUCCESS audit event should exist');
+        $this->assertSame('123e4567-e89b-12d3-a456-426614174001', $loginSuccessLog->userId);
+        $this->assertSame('info', $loginSuccessLog->level);
+        $this->assertStringContainsString('logged in successfully', $loginSuccessLog->message);
+        $this->assertNotNull($loginSuccessLog->ipAddress);
     }
 
     public function testAdminLoginFailsWithInvalidPassword(): void
@@ -100,6 +122,19 @@ final class SecurityControllerTest extends WebTestCase
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        // Verify audit log was created for failed login
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('COUNT(*)')
+            ->from('oauth_audit_logs')
+            ->where('event_type = :event_type')
+            ->setParameter('event_type', AuditEventTypeEnum::LOGIN_FAILURE->value);
+
+        $failureCountResult = $qb->executeQuery()->fetchOne();
+        $this->assertNotFalse($failureCountResult);
+        /** @phpstan-ignore-next-line cast.int */
+        $failureCount = (int) $failureCountResult;
+        $this->assertGreaterThan(0, $failureCount, 'LOGIN_FAILURE audit event should be logged');
     }
 
     public function testAdminLoginFailsWithNonExistentUser(): void
@@ -117,6 +152,21 @@ final class SecurityControllerTest extends WebTestCase
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        // Verify audit log was created for failed login with non-existent user
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')
+            ->from('oauth_audit_logs')
+            ->where('event_type = :event_type')
+            ->setParameter('event_type', AuditEventTypeEnum::LOGIN_FAILURE->value)
+            ->orderBy('created_at', 'DESC')
+            ->setMaxResults(1);
+
+        $result = $qb->executeQuery()->fetchAssociative();
+        $this->assertNotFalse($result, 'LOGIN_FAILURE audit event should exist');
+        $this->assertNull($result['user_id'], 'User ID should be null for non-existent user');
+        $this->assertIsString($result['context']);
+        $this->assertStringContainsString('nonexistent@example.com', $result['context'], 'Attempted email should be in context');
     }
 
     public function testAdminLoginFailsWithMissingEmail(): void
