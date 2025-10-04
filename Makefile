@@ -61,6 +61,9 @@ stop: ## Stop the app
 ##@ Tests
 test: DOCKER_COMPOSE_FILE=compose.test.yaml
 test:
+	@echo "Running database migrations for test environment..."
+	$(DOCKER_COMPOSE_RUN) php-test bin/console doctrine:migrations:migrate --no-interaction --quiet || true
+	@echo "Running tests..."
 	$(DOCKER_COMPOSE_RUN) php-test ./bin/phpunit $(R)
 	docker compose -f $(DOCKER_COMPOSE_FILE) down -v
 
