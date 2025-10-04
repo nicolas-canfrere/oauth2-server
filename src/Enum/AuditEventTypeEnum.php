@@ -36,4 +36,7 @@ enum AuditEventTypeEnum: string
     case INVALID_CLIENT_CREDENTIALS = 'security.client.invalid_credentials';
     case INVALID_GRANT = 'security.grant.invalid';
     case SUSPICIOUS_ACTIVITY = 'security.suspicious_activity';
+
+    // OAuth2 protocol errors
+    case OAUTH2_ERROR = 'oauth2.error';
 }

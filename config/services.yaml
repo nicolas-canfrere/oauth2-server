@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    oauth2.error_uri_base: '%env(OAUTH2_ERROR_URI_BASE)%'
 
 services:
     # default configuration for services in *this* file
@@ -57,3 +58,8 @@ services:
     App\Command\AuditLogCleanupCommand:
         arguments:
             $defaultRetentionDays: '%env(int:AUDIT_LOG_RETENTION_DAYS)%'
+
+    # OAuth2 Exception Subscriber with error URI base
+    App\OAuth2\EventSubscriber\OAuth2ExceptionSubscriber:
+        arguments:
+            $errorUriBase: '%oauth2.error_uri_base%'
