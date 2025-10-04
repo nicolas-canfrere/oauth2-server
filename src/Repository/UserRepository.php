@@ -44,8 +44,12 @@ final class UserRepository implements UserRepositoryInterface
             }
 
             return $this->hydrateUser($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch user with ID "%s": %s', $id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -69,8 +73,12 @@ final class UserRepository implements UserRepositoryInterface
             }
 
             return $this->hydrateUser($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch user by email "%s": %s', $email, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -98,7 +106,11 @@ final class UserRepository implements UserRepositoryInterface
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData, $types);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create user: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create user "%s": %s', $user->email, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -129,7 +141,11 @@ final class UserRepository implements UserRepositoryInterface
                 $types
             );
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update user: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to update user "%s": %s', $user->email, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -151,10 +167,14 @@ final class UserRepository implements UserRepositoryInterface
             );
 
             if (0 === $affectedRows) {
-                throw new \RuntimeException("User with ID {$userId} not found");
+                throw new RepositoryException(sprintf('User with ID "%s" not found', $userId));
             }
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update user password: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to update password for user ID "%s": %s', $userId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -170,8 +190,12 @@ final class UserRepository implements UserRepositoryInterface
             );
 
             return $affectedRows > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete user with ID "%s": %s', $id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

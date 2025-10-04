@@ -45,8 +45,12 @@ final class ConsentRepository implements ConsentRepositoryInterface
             }
 
             return $this->hydrateConsent($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch consent for user "%s" and client "%s": %s', $userId, $clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -79,8 +83,12 @@ final class ConsentRepository implements ConsentRepositoryInterface
             );
 
             return $affectedRows > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to revoke consent for user "%s" and client "%s": %s', $userId, $clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -97,8 +105,12 @@ final class ConsentRepository implements ConsentRepositoryInterface
 
         try {
             return $queryBuilder->executeStatement();
-        } catch (Exception) {
-            return 0;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete expired consents: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -122,8 +134,12 @@ final class ConsentRepository implements ConsentRepositoryInterface
                 fn(array $row): UserConsent => $this->hydrateConsent($row),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch consents for user "%s": %s', $userId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -144,7 +160,11 @@ final class ConsentRepository implements ConsentRepositoryInterface
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create user consent: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create user consent for user "%s" and client "%s": %s', $consent->userId, $consent->clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -169,7 +189,11 @@ final class ConsentRepository implements ConsentRepositoryInterface
                 ]
             );
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update user consent: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to update user consent for user "%s" and client "%s": %s', $consent->userId, $consent->clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

@@ -42,8 +42,12 @@ final class ScopeRepository implements ScopeRepositoryInterface
                 fn(array $row): OAuthScope => $this->hydrateScope($row),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch all scopes: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -70,8 +74,12 @@ final class ScopeRepository implements ScopeRepositoryInterface
                 fn(array $row): OAuthScope => $this->hydrateScope($row),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch scopes: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -95,8 +103,12 @@ final class ScopeRepository implements ScopeRepositoryInterface
                 fn(array $row): OAuthScope => $this->hydrateScope($row),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch default scopes: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -120,7 +132,11 @@ final class ScopeRepository implements ScopeRepositoryInterface
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData, $types);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create OAuth2 scope: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create OAuth2 scope "%s": %s', $scope->scope, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -147,7 +163,11 @@ final class ScopeRepository implements ScopeRepositoryInterface
                 $types
             );
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update OAuth2 scope: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to update OAuth2 scope "%s": %s', $scope->scope, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -171,8 +191,12 @@ final class ScopeRepository implements ScopeRepositoryInterface
             }
 
             return $this->hydrateScope($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch scope with ID "%s": %s', $id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

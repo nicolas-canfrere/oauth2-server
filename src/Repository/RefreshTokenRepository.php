@@ -49,7 +49,11 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData, $types);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create refresh token: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create refresh token for client "%s": %s', $refreshToken->clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -75,8 +79,12 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             }
 
             return $this->hydrateRefreshToken($result, $token);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch refresh token: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -104,8 +112,12 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
             );
 
             return $affectedRows > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to revoke refresh token: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -133,8 +145,12 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
                 fn(array $row): OAuthRefreshToken => $this->hydrateRefreshToken($row, '***REDACTED***'),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch active refresh tokens for user "%s": %s', $userId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -151,8 +167,12 @@ final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 
         try {
             return $queryBuilder->executeStatement();
-        } catch (Exception) {
-            return 0;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete expired refresh tokens: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

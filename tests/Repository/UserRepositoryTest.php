@@ -142,7 +142,7 @@ final class UserRepositoryTest extends KernelTestCase
     public function testUpdatePasswordNonExistentUser(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('User with ID 00000000-0000-0000-0000-000000000000 not found');
+        $this->expectExceptionMessage('User with ID "00000000-0000-0000-0000-000000000000" not found');
 
         $this->repository->updatePassword(
             '00000000-0000-0000-0000-000000000000',

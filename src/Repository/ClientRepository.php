@@ -44,8 +44,12 @@ final class ClientRepository implements ClientRepositoryInterface
             }
 
             return $this->hydrateClient($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch OAuth2 client with ID "%s": %s', $id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -69,8 +73,12 @@ final class ClientRepository implements ClientRepositoryInterface
             }
 
             return $this->hydrateClient($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch OAuth2 client by client_id "%s": %s', $clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -101,7 +109,11 @@ final class ClientRepository implements ClientRepositoryInterface
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData, $types);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create OAuth2 client: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create OAuth2 client "%s" (ID: %s): %s', $client->clientId, $client->id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -135,7 +147,11 @@ final class ClientRepository implements ClientRepositoryInterface
                 $types
             );
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update OAuth2 client: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to update OAuth2 client "%s" (ID: %s): %s', $client->clientId, $client->id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -151,8 +167,12 @@ final class ClientRepository implements ClientRepositoryInterface
             );
 
             return $affectedRows > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete OAuth2 client with ID "%s": %s', $id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -176,8 +196,12 @@ final class ClientRepository implements ClientRepositoryInterface
                 fn(array $row): OAuthClient => $this->hydrateClient($row),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch OAuth2 clients (limit: %d, offset: %d): %s', $limit, $offset, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

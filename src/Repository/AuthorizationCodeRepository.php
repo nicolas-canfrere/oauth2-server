@@ -46,7 +46,11 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create authorization code: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create authorization code for client "%s": %s', $authorizationCode->clientId, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -72,8 +76,12 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
             }
 
             return $this->hydrateAuthorizationCode($result, $code);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch authorization code: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -91,8 +99,12 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
             );
 
             return $affectedRows > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to consume authorization code: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -109,8 +121,12 @@ final class AuthorizationCodeRepository implements AuthorizationCodeRepositoryIn
 
         try {
             return $queryBuilder->executeStatement();
-        } catch (Exception) {
-            return 0;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete expired authorization codes: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

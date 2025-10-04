@@ -44,8 +44,12 @@ final class KeyRepository implements KeyRepositoryInterface
                 fn(array $row): OAuthKey => $this->hydrateKey($row),
                 $results
             );
-        } catch (Exception) {
-            return [];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch active keys: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -69,8 +73,12 @@ final class KeyRepository implements KeyRepositoryInterface
             }
 
             return $this->hydrateKey($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch key by kid "%s": %s', $kid, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -97,7 +105,11 @@ final class KeyRepository implements KeyRepositoryInterface
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData, $types);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to create OAuth2 key: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to create OAuth2 key (kid: %s): %s', $key->kid, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -127,7 +139,11 @@ final class KeyRepository implements KeyRepositoryInterface
                 $types
             );
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to update OAuth2 key: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to update OAuth2 key (kid: %s): %s', $key->kid, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -153,8 +169,12 @@ final class KeyRepository implements KeyRepositoryInterface
             );
 
             return $affectedRows > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to deactivate key (kid: %s): %s', $kid, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -171,8 +191,12 @@ final class KeyRepository implements KeyRepositoryInterface
 
         try {
             return $queryBuilder->executeStatement();
-        } catch (Exception) {
-            return 0;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete expired keys: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -196,8 +220,12 @@ final class KeyRepository implements KeyRepositoryInterface
             }
 
             return $this->hydrateKey($result);
-        } catch (Exception) {
-            return null;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to fetch key with ID "%s": %s', $id, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 

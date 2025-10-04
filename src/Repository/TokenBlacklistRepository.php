@@ -39,7 +39,11 @@ final class TokenBlacklistRepository implements TokenBlacklistRepositoryInterfac
         try {
             $this->connection->insert(self::TABLE_NAME, $insertData);
         } catch (Exception $exception) {
-            throw new \RuntimeException('Failed to add token to blacklist: ' . $exception->getMessage(), 0, $exception);
+            throw new RepositoryException(
+                sprintf('Failed to add token to blacklist (jti: %s): %s', $blacklistEntry->jti, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -60,8 +64,12 @@ final class TokenBlacklistRepository implements TokenBlacklistRepositoryInterfac
             $count = is_numeric($result) ? (int) $result : 0;
 
             return $count > 0;
-        } catch (Exception) {
-            return false;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to check if token is blacklisted (jti: %s): %s', $jti, $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
@@ -78,8 +86,12 @@ final class TokenBlacklistRepository implements TokenBlacklistRepositoryInterfac
 
         try {
             return $queryBuilder->executeStatement();
-        } catch (Exception) {
-            return 0;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to delete expired blacklist entries: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 }
