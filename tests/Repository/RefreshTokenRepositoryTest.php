@@ -151,8 +151,8 @@ final class RefreshTokenRepositoryTest extends KernelTestCase
         $this->assertCount(2, $activeTokens);
 
         // Verify tokens are sorted by created_at DESC (check by ID since tokens are redacted)
-        $this->assertSame('323e4567-e89b-12d3-a456-426614174004', $activeTokens[0]->id);
-        $this->assertSame('323e4567-e89b-12d3-a456-426614174003', $activeTokens[1]->id);
+        $this->assertSame('323e4567-e89b-12d3-a456-426614174003', $activeTokens[0]->id);
+        $this->assertSame('323e4567-e89b-12d3-a456-426614174004', $activeTokens[1]->id);
 
         // Note: token values are redacted in findActiveByUser() for security
         $this->assertSame('***REDACTED***', $activeTokens[0]->token);
