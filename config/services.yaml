@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     oauth2.error_uri_base: '%env(OAUTH2_ERROR_URI_BASE)%'
+    oauth2.issuer: '%env(OAUTH2_ISSUER)%'
+    oauth2.access_token_ttl: '%env(int:ACCESS_TOKEN_TTL)%'
 
 services:
     # default configuration for services in *this* file
@@ -63,3 +65,13 @@ services:
     App\OAuth2\EventSubscriber\OAuth2ExceptionSubscriber:
         arguments:
             $errorUriBase: '%oauth2.error_uri_base%'
+
+    # Private Key Encryption Service
+    App\Service\PrivateKeyEncryptionService:
+        arguments:
+            $encryptionKey: '%env(PRIVATE_KEY_ENCRYPTION_KEY)%'
+
+    # JWT Token Generator
+    App\OAuth2\Service\JwtTokenGenerator:
+        arguments:
+            $issuer: '%oauth2.issuer%'

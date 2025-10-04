@@ -12,7 +12,8 @@ RUN install-php-extensions \
     intl \
     pdo_pgsql \
     opcache \
-    redis
+    redis \
+    gmp
 
 ENV LOG_STREAM="php://stdout"
 

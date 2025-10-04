@@ -18,6 +18,13 @@ parameters:
     scanFiles:
         - vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
 
+    ignoreErrors:
+        # PHPUnit mock objects - false positives
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::(expects|method|willReturn|with)\(\)#'
+        - '#Cannot call method (expects|method|willReturn|with)\(\) on mixed#'
+        # assertIsString with string from PHPDoc - intended for runtime safety
+        - '#Call to method PHPUnit\\Framework\\Assert::assertIsString\(\) with string will always evaluate to true#'
+
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon
