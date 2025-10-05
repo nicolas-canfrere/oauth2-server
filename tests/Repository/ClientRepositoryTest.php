@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Infrastructure\Persistance\Doctrine\Repository\ClientRepository;
 use App\Model\OAuthClient;
-use App\Repository\ClientRepository;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

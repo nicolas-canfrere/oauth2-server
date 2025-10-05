@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Security;
 
+use App\Infrastructure\Persistance\Doctrine\Repository\UserRepository;
 use App\Model\User;
-use App\Repository\UserRepository;
 use App\Security\SecurityUser;
 use App\Security\UserProvider;
 use App\Tests\Helper\UserBuilder;

@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Model\UserConsent;
+use App\Repository\ConsentRepositoryInterface;
+use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 

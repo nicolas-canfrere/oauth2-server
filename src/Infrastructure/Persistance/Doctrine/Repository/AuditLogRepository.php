@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Enum\AuditEventTypeEnum;
 use App\Model\OAuthAuditLog;
+use App\Repository\AuditLogRepositoryInterface;
+use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;

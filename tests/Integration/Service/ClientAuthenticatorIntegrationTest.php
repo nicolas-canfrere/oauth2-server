@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Service;
 
+use App\Infrastructure\Persistance\Doctrine\Repository\ClientRepository;
 use App\Model\OAuthClient;
 use App\OAuth2\Exception\InvalidClientException;
-use App\Repository\ClientRepository;
 use App\Service\ClientAuthenticator;
 use Doctrine\DBAL\Connection;
 use Psr\Log\NullLogger;

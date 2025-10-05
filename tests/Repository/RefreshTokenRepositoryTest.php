@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Infrastructure\Persistance\Doctrine\Repository\RefreshTokenRepository;
 use App\Model\OAuthRefreshToken;
-use App\Repository\RefreshTokenRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
