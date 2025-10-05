@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Infrastructure\Http\Controller;
 
 use App\Security\SecurityUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

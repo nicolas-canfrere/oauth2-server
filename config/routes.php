@@ -6,7 +6,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 return static function (RoutingConfigurator $routingConfigurator): void {
     $routingConfigurator->import([
-        'path' => '../src/Controller/',
-        'namespace' => 'App\Controller',
+        'path' => '../src/Infrastructure/Http/Controller/',
+        'namespace' => 'App\Infrastructure\Http\Controller',
     ], 'attribute');
 };

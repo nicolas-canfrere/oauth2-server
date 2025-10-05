@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Example;
+namespace App\Infrastructure\Http\Controller\Example;
 
 use App\Service\RateLimiter\RateLimiterServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
