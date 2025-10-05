@@ -13,7 +13,7 @@ final readonly class OAuthClient
     public function __construct(
         public string $id,
         public string $clientId,
-        public string $clientSecretHash,
+        public ?string $clientSecretHash,
         public string $name,
         public string $redirectUri,
         public array $grantTypes,

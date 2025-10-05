@@ -5,13 +5,16 @@ declare(strict_types=1);
 use App\Infrastructure\Audit\AuditLogger;
 use App\Infrastructure\Audit\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\Infrastructure\Cli\Command\AuditLogCleanupCommand;
+use App\OAuth2\GrantHandler\GrantHandlerDispatcher;
+use App\OAuth2\GrantHandler\GrantHandlerInterface;
 use App\OAuth2\Service\JwtTokenGenerator;
 use App\Service\PrivateKeyEncryptionService;
 use App\Service\RateLimiter\RateLimiterService;
 use App\Service\TokenHasher;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
@@ -21,6 +24,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters->set('oauth2.issuer', '%env(OAUTH2_ISSUER)%');
 
     $parameters->set('oauth2.access_token_ttl', '%env(int:ACCESS_TOKEN_TTL)%');
+    $parameters->set('oauth2.client_credentials.access_token_ttl', '%env(int:CLIENT_CREDENTIALS_ACCESS_TOKEN_TTL)%');
 
     $services = $containerConfigurator->services();
 
@@ -69,4 +73,13 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->set(JwtTokenGenerator::class)
         ->arg('$issuer', '%oauth2.issuer%');
+
+    $services->instanceof(GrantHandlerInterface::class)
+        ->tag('oauth2.grant_handler');
+
+    $services->set(GrantHandlerDispatcher::class)
+        ->arg('$handlers', tagged_iterator('oauth2.grant_handler'));
+
+    $services->set(App\OAuth2\GrantHandler\ClientCredentialsGrantHandler::class)
+        ->arg('$accessTokenTtl', '%oauth2.client_credentials.access_token_ttl%');
 };

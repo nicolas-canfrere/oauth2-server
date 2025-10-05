@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\OAuth2\GrantHandler;
 
+use App\Domain\OAuthClient\Model\OAuthClient;
 use App\OAuth2\DTO\TokenResponseDTO;
 use App\OAuth2\Exception\InvalidGrantException;
 use App\OAuth2\Exception\InvalidRequestException;
 use App\OAuth2\Exception\OAuth2Exception;
+use App\OAuth2\GrantType;
 
 /**
  * Interface for OAuth2 Grant Type Handlers.
@@ -36,11 +38,11 @@ interface GrantHandlerInterface
      * - "refresh_token" (RFC 6749 Section 6)
      * - "password" (RFC 6749 Section 4.3, not recommended)
      *
-     * @param string $grantType The grant_type parameter from the token request
+     * @param GrantType $grantType The grant_type parameter from the token request
      *
      * @return bool True if this handler can process the grant type, false otherwise
      */
-    public function supports(string $grantType): bool;
+    public function supports(GrantType $grantType): bool;
 
     /**
      * Processes the grant request and returns a token response.
@@ -73,5 +75,5 @@ interface GrantHandlerInterface
      * @see https://datatracker.ietf.org/doc/html/rfc6749#section-4 (Authorization Grant)
      * @see https://datatracker.ietf.org/doc/html/rfc6749#section-5.1 (Successful Response)
      */
-    public function handle(array $parameters): TokenResponseDTO;
+    public function handle(array $parameters, OAuthClient $client): TokenResponseDTO;
 }

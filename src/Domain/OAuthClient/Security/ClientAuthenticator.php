@@ -165,8 +165,15 @@ final readonly class ClientAuthenticator implements ClientAuthenticatorInterface
         }
 
         // Confidential clients must provide valid secret
-        if ($client->isConfidential && !$this->verifyClientSecret($clientSecret, $client->clientSecretHash)) {
-            throw new InvalidClientException('Client authentication failed: invalid client secret.');
+        if ($client->isConfidential) {
+            if (null === $client->clientSecretHash) {
+                // This case should ideally not happen if data integrity is maintained
+                throw new InvalidClientException('Client is confidential but has no secret.');
+            }
+
+            if (!$this->verifyClientSecret($clientSecret, $client->clientSecretHash)) {
+                throw new InvalidClientException('Client authentication failed: invalid client secret.');
+            }
         }
 
         // Public clients should not send secrets (informational log only)
