@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Security;
+namespace App\Infrastructure\Security;
 
+use App\Infrastructure\Security\User\SecurityUser;
 use App\Repository\UserRepositoryInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;

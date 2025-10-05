@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Security;
+namespace App\Infrastructure\Security;
 
+use App\Infrastructure\Security\User\OAuth2ClientUser;
 use App\OAuth2\Exception\InvalidClientException;
 use App\OAuth2\Exception\OAuth2Exception;
 use App\Service\ClientAuthenticatorInterface;

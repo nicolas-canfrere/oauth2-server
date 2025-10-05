@@ -8,7 +8,7 @@ use App\Domain\Audit\DTO\AuditEventDTO;
 use App\Domain\Audit\Enum\AuditEventTypeEnum;
 use App\Domain\Audit\Service\AuditLoggerInterface;
 use App\Infrastructure\Audit\EventSubscriber\AuthenticationSuccessSubscriber;
-use App\Security\SecurityUser;
+use App\Infrastructure\Security\User\SecurityUser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

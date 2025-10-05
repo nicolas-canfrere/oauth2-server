@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Security\OAuth2ClientAuthenticator;
-use App\Security\UserProvider;
+use App\Infrastructure\Security\OAuth2ClientAuthenticator;
+use App\Infrastructure\Security\UserProvider;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 

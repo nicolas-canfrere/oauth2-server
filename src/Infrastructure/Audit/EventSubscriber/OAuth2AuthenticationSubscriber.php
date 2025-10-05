@@ -6,7 +6,7 @@ namespace App\Infrastructure\Audit\EventSubscriber;
 
 use App\Domain\Audit\DTO\AuditEventDTO;
 use App\Domain\Audit\Service\AuditLoggerInterface;
-use App\Security\OAuth2ClientUser;
+use App\Infrastructure\Security\User\OAuth2ClientUser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;

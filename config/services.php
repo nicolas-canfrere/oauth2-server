@@ -31,7 +31,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->load('App\\', __DIR__ . '/../src/')
         ->exclude([
             __DIR__ . '/../src/Model/',
-            __DIR__ . '/../src/Security/SecurityUser.php',
+            __DIR__ . '/../src/Infrastructure/Security/User/',
         ]);
 
     $services->set(TokenHasher::class)

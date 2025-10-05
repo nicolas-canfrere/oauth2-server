@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Security;
 
-use App\Security\SecurityUser;
+use App\Infrastructure\Security\User\SecurityUser;
 use App\Tests\Helper\UserBuilder;
 use PHPUnit\Framework\TestCase;
 
