@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Model\OAuthClient;
-use App\OAuth2\Exception\InvalidClientException;
-use App\Repository\ClientRepositoryInterface;
-use App\Service\ClientAuthenticator;
+use App\Domain\OAuthClient\Exception\InvalidClientException;
+use App\Domain\OAuthClient\Model\OAuthClient;
+use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
+use App\Domain\OAuthClient\Security\ClientAuthenticator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

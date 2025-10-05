@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Exception;
+namespace App\Domain\OAuthClient\Exception;
 
 /**
  * Exception thrown when a client secret fails security validation.

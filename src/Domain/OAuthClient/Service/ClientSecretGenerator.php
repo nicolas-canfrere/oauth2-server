@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\OAuthClient\Service;
 
-use App\Exception\InvalidClientSecretException;
+use App\Domain\OAuthClient\Exception\InvalidClientSecretException;
 
 /**
  * Generates and validates cryptographically secure OAuth2 client secrets.

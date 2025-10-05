@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Service;
 
+use App\Domain\OAuthClient\Exception\InvalidClientException;
+use App\Domain\OAuthClient\Model\OAuthClient;
+use App\Domain\OAuthClient\Security\ClientAuthenticator;
 use App\Infrastructure\Persistance\Doctrine\Repository\ClientRepository;
-use App\Model\OAuthClient;
-use App\OAuth2\Exception\InvalidClientException;
-use App\Service\ClientAuthenticator;
 use Doctrine\DBAL\Connection;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Security;
 
+use App\Domain\OAuthClient\Exception\InvalidClientException;
+use App\Domain\OAuthClient\Security\ClientAuthenticatorInterface;
 use App\Infrastructure\Security\User\OAuth2ClientUser;
-use App\OAuth2\Exception\InvalidClientException;
 use App\OAuth2\Exception\OAuth2Exception;
-use App\Service\ClientAuthenticatorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

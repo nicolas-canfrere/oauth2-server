@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Exception;
+namespace App\Domain\OAuthClient\Exception;
+
+use App\OAuth2\Exception\OAuth2Exception;
 
 /**
  * Exception thrown when client authentication failed

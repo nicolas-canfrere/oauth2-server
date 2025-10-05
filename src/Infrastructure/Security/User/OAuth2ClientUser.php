@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Security\User;
 
-use App\Model\OAuthClient;
+use App\Domain\OAuthClient\Model\OAuthClient;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**

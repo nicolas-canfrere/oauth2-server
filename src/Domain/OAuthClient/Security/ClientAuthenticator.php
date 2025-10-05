@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\OAuthClient\Security;
 
-use App\Model\OAuthClient;
-use App\OAuth2\Exception\InvalidClientException;
-use App\Repository\ClientRepositoryInterface;
+use App\Domain\OAuthClient\Exception\InvalidClientException;
+use App\Domain\OAuthClient\Model\OAuthClient;
+use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 

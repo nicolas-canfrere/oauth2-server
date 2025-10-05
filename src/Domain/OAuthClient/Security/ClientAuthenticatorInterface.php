@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\OAuthClient\Security;
 
-use App\Model\OAuthClient;
+use App\Domain\OAuthClient\Model\OAuthClient;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -29,7 +29,7 @@ interface ClientAuthenticatorInterface
      *
      * @return OAuthClient Authenticated client
      *
-     * @throws \App\OAuth2\Exception\InvalidClientException If authentication fails
+     * @throws \App\Domain\OAuthClient\Exception\InvalidClientException If authentication fails
      */
     public function authenticate(Request $request): OAuthClient;
 
@@ -42,7 +42,7 @@ interface ClientAuthenticatorInterface
      *
      * @return OAuthClient Authenticated client
      *
-     * @throws \App\OAuth2\Exception\InvalidClientException If authentication fails
+     * @throws \App\Domain\OAuthClient\Exception\InvalidClientException If authentication fails
      */
     public function authenticateWithBasicAuth(Request $request): OAuthClient;
 
@@ -55,7 +55,7 @@ interface ClientAuthenticatorInterface
      *
      * @return OAuthClient Authenticated client
      *
-     * @throws \App\OAuth2\Exception\InvalidClientException If authentication fails
+     * @throws \App\Domain\OAuthClient\Exception\InvalidClientException If authentication fails
      */
     public function authenticateWithPostBody(Request $request): OAuthClient;
 
@@ -69,7 +69,7 @@ interface ClientAuthenticatorInterface
      *
      * @return OAuthClient Authenticated public client
      *
-     * @throws \App\OAuth2\Exception\InvalidClientException If client is not found or is not a public client
+     * @throws \App\Domain\OAuthClient\Exception\InvalidClientException If client is not found or is not a public client
      */
     public function authenticatePublicClient(string $clientId): OAuthClient;
 

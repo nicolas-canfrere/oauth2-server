@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\OAuthClient\Repository;
 
-use App\Model\OAuthClient;
+use App\Domain\OAuthClient\Model\OAuthClient;
 
 /**
  * Interface for OAuth2 client repository operations.

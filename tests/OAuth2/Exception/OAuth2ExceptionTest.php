@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\OAuth2\Exception;
 
+use App\Domain\OAuthClient\Exception\InvalidClientException;
 use App\OAuth2\Exception\AccessDeniedException;
-use App\OAuth2\Exception\InvalidClientException;
 use App\OAuth2\Exception\InvalidGrantException;
 use App\OAuth2\Exception\InvalidRequestException;
 use App\OAuth2\Exception\InvalidScopeException;

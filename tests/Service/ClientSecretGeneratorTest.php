@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Exception\InvalidClientSecretException;
-use App\Service\ClientSecretGenerator;
+use App\Domain\OAuthClient\Exception\InvalidClientSecretException;
+use App\Domain\OAuthClient\Service\ClientSecretGenerator;
 use PHPUnit\Framework\TestCase;
 
 /**

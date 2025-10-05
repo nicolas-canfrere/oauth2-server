@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\OAuthClient;
-use App\Repository\ClientRepositoryInterface;
+use App\Domain\OAuthClient\Model\OAuthClient;
+use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
 use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
