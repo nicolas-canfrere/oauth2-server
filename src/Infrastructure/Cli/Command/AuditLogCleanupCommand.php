@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Command;
+namespace App\Infrastructure\Cli\Command;
 
 use App\Repository\AuditLogRepositoryInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * - php bin/console audit:cleanup --dry-run          # Preview deletion without executing
  */
 #[AsCommand(
-    name: 'audit:cleanup',
+    name: 'oauth2:audit:cleanup',
     description: 'Clean up audit logs older than retention period',
 )]
 final class AuditLogCleanupCommand extends Command

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Command\AuditLogCleanupCommand;
+use App\Infrastructure\Cli\Command\AuditLogCleanupCommand;
 use App\OAuth2\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\OAuth2\Service\JwtTokenGenerator;
 use App\Service\AuditLogger;
@@ -10,10 +10,8 @@ use App\Service\PrivateKeyEncryptionService;
 use App\Service\RateLimiter\RateLimiterService;
 use App\Service\TokenHasher;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
