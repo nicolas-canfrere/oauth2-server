@@ -199,6 +199,51 @@ readonly class AuditEventDTO
     }
 
     /**
+     * Creates an audit event for successful OAuth2 client authentication.
+     *
+     * @param array<string, mixed> $additionalContext
+     */
+    public static function clientAuthenticated(
+        string $clientId,
+        ?string $ipAddress,
+        ?string $userAgent,
+        array $additionalContext = [],
+    ): self {
+        return new self(
+            eventType: AuditEventTypeEnum::CLIENT_AUTHENTICATED,
+            level: 'info',
+            message: sprintf('OAuth2 client "%s" authenticated successfully', $clientId),
+            context: $additionalContext,
+            clientId: $clientId,
+            ipAddress: $ipAddress,
+            userAgent: $userAgent
+        );
+    }
+
+    /**
+     * Creates an audit event for failed OAuth2 client authentication.
+     *
+     * @param array<string, mixed> $additionalContext
+     */
+    public static function clientAuthenticationFailed(
+        ?string $clientId,
+        string $ipAddress,
+        string $userAgent,
+        string $reason,
+        array $additionalContext = [],
+    ): self {
+        return new self(
+            eventType: AuditEventTypeEnum::CLIENT_AUTHENTICATION_FAILED,
+            level: 'warning',
+            message: sprintf('OAuth2 client authentication failed: %s', $reason),
+            context: array_merge(['reason' => $reason], $additionalContext),
+            clientId: $clientId,
+            ipAddress: $ipAddress,
+            userAgent: $userAgent
+        );
+    }
+
+    /**
      * Converts DTO to array for JSON serialization.
      *
      * @return array<string, mixed>

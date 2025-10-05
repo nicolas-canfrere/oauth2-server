@@ -22,8 +22,8 @@ security:
         oauth:
             pattern: ^/oauth
             stateless: true
-            provider: app_user_provider
-            # OAuth2 endpoints use client authentication, not user authentication
+            custom_authenticators:
+                - App\Security\OAuth2ClientAuthenticator
 
         # Admin interface firewall
         admin:

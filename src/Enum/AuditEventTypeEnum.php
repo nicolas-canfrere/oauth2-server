@@ -16,6 +16,10 @@ enum AuditEventTypeEnum: string
     case LOGIN_SUCCESS = 'auth.login.success';
     case LOGIN_FAILURE = 'auth.login.failure';
 
+    // OAuth2 Client authentication events
+    case CLIENT_AUTHENTICATED = 'auth.client.authenticated';
+    case CLIENT_AUTHENTICATION_FAILED = 'auth.client.failed';
+
     // Token issuance events
     case ACCESS_TOKEN_ISSUED = 'token.access.issued';
     case REFRESH_TOKEN_ISSUED = 'token.refresh.issued';
