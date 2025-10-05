@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Infrastructure\Audit;
 
-use App\DTO\AuditEventDTO;
-use App\Model\OAuthAuditLog;
-use App\Repository\AuditLogRepositoryInterface;
+use App\Domain\Audit\DTO\AuditEventDTO;
+use App\Domain\Audit\Model\OAuthAuditLog;
+use App\Domain\Audit\Repository\AuditLogRepositoryInterface;
+use App\Domain\Audit\Service\AuditLoggerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -113,15 +115,15 @@ final class AuditLogger implements AuditLoggerInterface
     private function mapLogLevel(string $level): string
     {
         return match (strtolower($level)) {
-            'emergency' => \Psr\Log\LogLevel::EMERGENCY,
-            'alert' => \Psr\Log\LogLevel::ALERT,
-            'critical' => \Psr\Log\LogLevel::CRITICAL,
-            'error' => \Psr\Log\LogLevel::ERROR,
-            'warning' => \Psr\Log\LogLevel::WARNING,
-            'notice' => \Psr\Log\LogLevel::NOTICE,
-            'info' => \Psr\Log\LogLevel::INFO,
-            'debug' => \Psr\Log\LogLevel::DEBUG,
-            default => \Psr\Log\LogLevel::INFO,
+            'emergency' => LogLevel::EMERGENCY,
+            'alert' => LogLevel::ALERT,
+            'critical' => LogLevel::CRITICAL,
+            'error' => LogLevel::ERROR,
+            'warning' => LogLevel::WARNING,
+            'notice' => LogLevel::NOTICE,
+            'info' => LogLevel::INFO,
+            'debug' => LogLevel::DEBUG,
+            default => LogLevel::INFO,
         };
     }
 }

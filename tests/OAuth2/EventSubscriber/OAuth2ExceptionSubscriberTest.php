@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\OAuth2\EventSubscriber;
 
-use App\DTO\AuditEventDTO;
-use App\Enum\AuditEventTypeEnum;
-use App\OAuth2\EventSubscriber\OAuth2ExceptionSubscriber;
+use App\Domain\Audit\DTO\AuditEventDTO;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Service\AuditLoggerInterface;
+use App\Infrastructure\Audit\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\OAuth2\Exception\AccessDeniedException;
 use App\OAuth2\Exception\InvalidClientException;
 use App\OAuth2\Exception\InvalidGrantException;
@@ -15,7 +16,6 @@ use App\OAuth2\Exception\InvalidScopeException;
 use App\OAuth2\Exception\ServerErrorException;
 use App\OAuth2\Exception\UnauthorizedClientException;
 use App\OAuth2\Exception\UnsupportedGrantTypeException;
-use App\Service\AuditLoggerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;

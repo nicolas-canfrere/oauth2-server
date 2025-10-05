@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\Audit\Repository;
 
-use App\Enum\AuditEventTypeEnum;
-use App\Model\OAuthAuditLog;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Model\OAuthAuditLog;
 
 /**
  * Interface for audit log repository operations.

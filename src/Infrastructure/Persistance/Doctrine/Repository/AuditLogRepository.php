@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Enum\AuditEventTypeEnum;
-use App\Model\OAuthAuditLog;
-use App\Repository\AuditLogRepositoryInterface;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Model\OAuthAuditLog;
+use App\Domain\Audit\Repository\AuditLogRepositoryInterface;
 use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;

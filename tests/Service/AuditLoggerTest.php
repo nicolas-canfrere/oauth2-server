@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\DTO\AuditEventDTO;
-use App\Enum\AuditEventTypeEnum;
-use App\Model\OAuthAuditLog;
-use App\Repository\AuditLogRepositoryInterface;
-use App\Service\AuditLogger;
+use App\Domain\Audit\DTO\AuditEventDTO;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Model\OAuthAuditLog;
+use App\Domain\Audit\Repository\AuditLogRepositoryInterface;
+use App\Infrastructure\Audit\AuditLogger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

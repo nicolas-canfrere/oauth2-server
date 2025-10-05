@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Infrastructure\Audit\AuditLogger;
+use App\Infrastructure\Audit\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\Infrastructure\Cli\Command\AuditLogCleanupCommand;
-use App\OAuth2\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\OAuth2\Service\JwtTokenGenerator;
-use App\Service\AuditLogger;
 use App\Service\PrivateKeyEncryptionService;
 use App\Service\RateLimiter\RateLimiterService;
 use App\Service\TokenHasher;

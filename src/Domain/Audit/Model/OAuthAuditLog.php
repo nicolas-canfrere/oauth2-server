@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Domain\Audit\Model;
 
-use App\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
 
 /**
  * Audit log model for OAuth2 security events.

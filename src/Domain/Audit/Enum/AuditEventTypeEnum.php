@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enum;
+namespace App\Domain\Audit\Enum;
 
 /**
  * Audit event types for OAuth2 server security logging.

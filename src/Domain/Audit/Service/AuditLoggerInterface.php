@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\Audit\Service;
 
-use App\DTO\AuditEventDTO;
+use App\Domain\Audit\DTO\AuditEventDTO;
 
 /**
  * Interface for audit logging service.

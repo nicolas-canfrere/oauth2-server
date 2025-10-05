@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
-use App\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Model\OAuthAuditLog;
 use App\Infrastructure\Persistance\Doctrine\Repository\AuditLogRepository;
-use App\Model\OAuthAuditLog;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\Uuid;

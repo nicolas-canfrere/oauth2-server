@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\DTO;
+namespace App\Domain\Audit\DTO;
 
-use App\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
 
 /**
  * Data Transfer Object for audit events.

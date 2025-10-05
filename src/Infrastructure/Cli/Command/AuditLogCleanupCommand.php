@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Cli\Command;
 
-use App\Repository\AuditLogRepositoryInterface;
+use App\Domain\Audit\Repository\AuditLogRepositoryInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

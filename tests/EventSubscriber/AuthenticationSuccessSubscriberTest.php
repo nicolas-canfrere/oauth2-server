@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\EventSubscriber;
 
-use App\DTO\AuditEventDTO;
-use App\Enum\AuditEventTypeEnum;
-use App\EventSubscriber\AuthenticationSuccessSubscriber;
+use App\Domain\Audit\DTO\AuditEventDTO;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Service\AuditLoggerInterface;
+use App\Infrastructure\Audit\EventSubscriber\AuthenticationSuccessSubscriber;
 use App\Security\SecurityUser;
-use App\Service\AuditLoggerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

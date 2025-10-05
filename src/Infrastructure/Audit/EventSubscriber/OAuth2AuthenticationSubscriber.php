@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Security\EventSubscriber;
+namespace App\Infrastructure\Audit\EventSubscriber;
 
-use App\DTO\AuditEventDTO;
+use App\Domain\Audit\DTO\AuditEventDTO;
+use App\Domain\Audit\Service\AuditLoggerInterface;
 use App\Security\OAuth2ClientUser;
-use App\Service\AuditLoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;

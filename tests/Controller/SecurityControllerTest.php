@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Enum\AuditEventTypeEnum;
+use App\Domain\Audit\Enum\AuditEventTypeEnum;
 use App\Infrastructure\Persistance\Doctrine\Repository\AuditLogRepository;
 use App\Infrastructure\Persistance\Doctrine\Repository\UserRepository;
 use App\Tests\Helper\UserBuilder;
