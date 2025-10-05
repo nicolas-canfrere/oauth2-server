@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Domain\User\Model\User;
 use App\Infrastructure\Persistance\Doctrine\Repository\UserRepository;
-use App\Model\User;
 use App\Tests\Helper\UserBuilder;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\Group;

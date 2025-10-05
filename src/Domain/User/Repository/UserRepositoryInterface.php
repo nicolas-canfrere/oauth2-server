@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\User\Repository;
 
-use App\Model\User;
+use App\Domain\User\Model\User;
 
 /**
  * Interface for user repository operations.

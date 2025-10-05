@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Helper;
 
-use App\Model\User;
+use App\Domain\User\Model\User;
 use Symfony\Component\Uid\Uuid;
 
 final class UserBuilder

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Security;
 
+use App\Domain\User\Model\User;
 use App\Infrastructure\Persistance\Doctrine\Repository\UserRepository;
 use App\Infrastructure\Security\User\SecurityUser;
 use App\Infrastructure\Security\UserProvider;
-use App\Model\User;
 use App\Tests\Helper\UserBuilder;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

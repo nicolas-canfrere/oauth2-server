@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Security;
 
+use App\Domain\User\Repository\UserRepositoryInterface;
 use App\Infrastructure\Security\User\SecurityUser;
-use App\Repository\UserRepositoryInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
