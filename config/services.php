@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
+use App\Application\AccessToken\GrantHandler\GrantHandlerDispatcher;
+use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;
 use App\Infrastructure\Audit\AuditLogger;
 use App\Infrastructure\Audit\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\Infrastructure\Cli\Command\AuditLogCleanupCommand;
-use App\OAuth2\GrantHandler\GrantHandlerDispatcher;
-use App\OAuth2\GrantHandler\GrantHandlerInterface;
 use App\OAuth2\Service\JwtTokenGenerator;
 use App\Service\PrivateKeyEncryptionService;
 use App\Service\RateLimiter\RateLimiterService;
 use App\Service\TokenHasher;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
@@ -80,6 +80,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(GrantHandlerDispatcher::class)
         ->arg('$handlers', tagged_iterator('oauth2.grant_handler'));
 
-    $services->set(App\OAuth2\GrantHandler\ClientCredentialsGrantHandler::class)
+    $services->set(\App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler::class)
         ->arg('$accessTokenTtl', '%oauth2.client_credentials.access_token_ttl%');
 };

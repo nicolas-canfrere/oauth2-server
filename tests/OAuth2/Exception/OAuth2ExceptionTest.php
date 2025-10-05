@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\OAuth2\Exception;
 
+use App\Application\AccessToken\Exception\InvalidRequestException;
+use App\Application\AccessToken\Exception\UnsupportedGrantTypeException;
 use App\Domain\OAuthClient\Exception\InvalidClientException;
+use App\Domain\OAuthClient\Exception\UnauthorizedClientException;
 use App\OAuth2\Exception\AccessDeniedException;
 use App\OAuth2\Exception\InvalidGrantException;
-use App\OAuth2\Exception\InvalidRequestException;
 use App\OAuth2\Exception\InvalidScopeException;
 use App\OAuth2\Exception\OAuth2Exception;
 use App\OAuth2\Exception\ServerErrorException;
-use App\OAuth2\Exception\UnauthorizedClientException;
-use App\OAuth2\Exception\UnsupportedGrantTypeException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

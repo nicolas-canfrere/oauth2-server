@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\OAuth2\Service;
 
+use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Model\OAuthKey;
-use App\OAuth2\DTO\JwtPayloadDTO;
 use App\OAuth2\Service\JwtTokenGenerator;
 use App\Repository\KeyRepositoryInterface;
 use App\Service\PrivateKeyEncryptionServiceInterface;

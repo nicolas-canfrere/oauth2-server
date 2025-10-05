@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\DTO;
+namespace App\Application\AccessToken\DTO;
 
 /**
  * Data Transfer Object representing an OAuth2 token response.

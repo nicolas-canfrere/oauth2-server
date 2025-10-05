@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\OAuth2\Service;
 
-use App\OAuth2\DTO\JwtPayloadDTO;
+use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Repository\KeyRepositoryInterface;
 use App\Service\PrivateKeyEncryptionServiceInterface;
 use Jose\Component\Core\AlgorithmManager;

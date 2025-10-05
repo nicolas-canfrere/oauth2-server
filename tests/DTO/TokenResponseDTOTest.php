@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\DTO;
 
-use App\OAuth2\DTO\TokenResponseDTO;
+use App\Application\AccessToken\DTO\TokenResponseDTO;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \App\OAuth2\DTO\TokenResponseDTO
+ * @covers \App\Application\AccessToken\DTO\TokenResponseDTO
  */
 final class TokenResponseDTOTest extends TestCase
 {

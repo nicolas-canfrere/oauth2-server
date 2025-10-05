@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\OAuth2\GrantHandler;
 
+use App\Application\AccessToken\DTO\TokenResponseDTO;
+use App\Application\AccessToken\Exception\InvalidRequestException;
+use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;
 use App\Domain\OAuthClient\Model\OAuthClient;
-use App\OAuth2\DTO\TokenResponseDTO;
 use App\OAuth2\Exception\InvalidGrantException;
-use App\OAuth2\Exception\InvalidRequestException;
-use App\OAuth2\GrantHandler\GrantHandlerInterface;
 use App\OAuth2\GrantType;
 use App\Tests\Helper\ClientBuilder;
 use PHPUnit\Framework\TestCase;

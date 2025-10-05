@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Exception;
+namespace App\Application\AccessToken\Exception;
+
+use App\OAuth2\Exception\OAuth2Exception;
 
 /**
- * Exception thrown when the authorization grant type is not supported
- * by the authorization server.
+ * Exception thrown when the request is missing a required parameter,
+ * includes an invalid parameter value, includes a parameter more than once,
+ * or is otherwise malformed.
  *
- * RFC 6749 Error Code: unsupported_grant_type
+ * RFC 6749 Error Code: invalid_request
  * HTTP Status: 400 Bad Request
  *
  * @see https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
  */
-final class UnsupportedGrantTypeException extends OAuth2Exception
+final class InvalidRequestException extends OAuth2Exception
 {
     /**
      * @param string|null $errorDescription Custom error description (default: RFC-compliant generic message)
@@ -28,8 +31,8 @@ final class UnsupportedGrantTypeException extends OAuth2Exception
         ?\Throwable $previous = null,
     ) {
         parent::__construct(
-            error: 'unsupported_grant_type',
-            errorDescription: $errorDescription ?? 'The authorization grant type is not supported by the authorization server.',
+            error: 'invalid_request',
+            errorDescription: $errorDescription ?? 'The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.',
             errorUri: $errorUri,
             httpStatus: 400,
             code: $code,

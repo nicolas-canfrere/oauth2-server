@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\GrantHandler;
+namespace App\Application\AccessToken\GrantHandler;
 
+use App\Application\AccessToken\DTO\TokenResponseDTO;
+use App\Application\AccessToken\Exception\InvalidRequestException;
+use App\Application\AccessToken\Exception\UnsupportedGrantTypeException;
 use App\Domain\OAuthClient\Model\OAuthClient;
-use App\OAuth2\DTO\TokenResponseDTO;
-use App\OAuth2\Exception\InvalidRequestException;
-use App\OAuth2\Exception\UnsupportedGrantTypeException;
 use App\OAuth2\GrantType;
 
 final readonly class GrantHandlerDispatcher
