@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\AccessToken\Exception;
 
-use App\OAuth2\Exception\OAuth2Exception;
-
 /**
  * Exception thrown when the authorization grant type is not supported
  * by the authorization server.

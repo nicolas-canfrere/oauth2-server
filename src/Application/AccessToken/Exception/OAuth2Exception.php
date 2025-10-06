@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Exception;
+namespace App\Application\AccessToken\Exception;
 
 /**
  * Base exception class for OAuth2 errors conforming to RFC 6749.

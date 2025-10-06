@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\OAuthClient\Exception;
 
-use App\OAuth2\Exception\OAuth2Exception;
+use App\Application\AccessToken\Exception\OAuth2Exception;
 
 class UnauthorizedClientException extends OAuth2Exception
 {

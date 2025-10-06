@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Exception;
+namespace App\Application\AccessToken\Exception;
 
 /**
- * Exception thrown when the resource owner or authorization server denied the request.
+ * Exception thrown when the requested scope is invalid, unknown, malformed,
+ * or exceeds the scope granted by the resource owner.
  *
- * RFC 6749 Error Code: access_denied
- * HTTP Status: 403 Forbidden
+ * RFC 6749 Error Code: invalid_scope
+ * HTTP Status: 400 Bad Request
  *
- * @see https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+ * @see https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
  */
-final class AccessDeniedException extends OAuth2Exception
+final class InvalidScopeException extends OAuth2Exception
 {
     /**
      * @param string|null $errorDescription Custom error description (default: RFC-compliant generic message)
@@ -27,10 +28,10 @@ final class AccessDeniedException extends OAuth2Exception
         ?\Throwable $previous = null,
     ) {
         parent::__construct(
-            error: 'access_denied',
-            errorDescription: $errorDescription ?? 'The resource owner or authorization server denied the request.',
+            error: 'invalid_scope',
+            errorDescription: $errorDescription ?? 'The requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner.',
             errorUri: $errorUri,
-            httpStatus: 403,
+            httpStatus: 400,
             code: $code,
             previous: $previous,
         );

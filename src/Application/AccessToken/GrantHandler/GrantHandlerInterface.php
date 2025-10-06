@@ -6,10 +6,10 @@ namespace App\Application\AccessToken\GrantHandler;
 
 use App\Application\AccessToken\DTO\TokenResponseDTO;
 use App\Application\AccessToken\Enum\GrantType;
+use App\Application\AccessToken\Exception\InvalidGrantException;
 use App\Application\AccessToken\Exception\InvalidRequestException;
+use App\Application\AccessToken\Exception\OAuth2Exception;
 use App\Domain\OAuthClient\Model\OAuthClient;
-use App\OAuth2\Exception\InvalidGrantException;
-use App\OAuth2\Exception\OAuth2Exception;
 
 /**
  * Interface for OAuth2 Grant Type Handlers.

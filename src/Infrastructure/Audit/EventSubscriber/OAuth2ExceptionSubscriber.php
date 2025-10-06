@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Audit\EventSubscriber;
 
+use App\Application\AccessToken\Exception\OAuth2Exception;
 use App\Domain\Audit\DTO\AuditEventDTO;
 use App\Domain\Audit\Enum\AuditEventTypeEnum;
 use App\Domain\Audit\Service\AuditLoggerInterface;
-use App\OAuth2\Exception\OAuth2Exception;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

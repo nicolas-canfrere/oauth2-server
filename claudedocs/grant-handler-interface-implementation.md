@@ -216,7 +216,7 @@ declare(strict_types=1);
 
 namespace App\OAuth2\GrantHandler;
 
-use App\Application\AccessToken\Exception\InvalidRequestException;use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;use App\Domain\AuthorizationCode\Repository\AuthorizationCodeRepositoryInterface;use App\DTO\TokenResponseDTO;use App\OAuth2\Exception\InvalidGrantException;use App\Service\TokenGenerator;
+use App\Application\AccessToken\Exception\InvalidGrantException;use App\Application\AccessToken\Exception\InvalidRequestException;use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;use App\Domain\AuthorizationCode\Repository\AuthorizationCodeRepositoryInterface;use App\DTO\TokenResponseDTO;use App\Service\TokenGenerator;
 
 final readonly class AuthorizationCodeGrantHandler implements GrantHandlerInterface
 {

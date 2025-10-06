@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\AccessToken\Exception;
 
-use App\OAuth2\Exception\OAuth2Exception;
-
 /**
  * Exception thrown when the request is missing a required parameter,
  * includes an invalid parameter value, includes a parameter more than once,

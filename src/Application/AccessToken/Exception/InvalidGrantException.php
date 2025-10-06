@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Exception;
+namespace App\Application\AccessToken\Exception;
 
 /**
  * Exception thrown when the provided authorization grant (e.g., authorization code,
