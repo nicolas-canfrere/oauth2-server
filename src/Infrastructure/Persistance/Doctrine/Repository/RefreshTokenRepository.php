@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\OAuthRefreshToken;
-use App\Repository\RefreshTokenRepositoryInterface;
+use App\Domain\RefreshToken\Model\OAuthRefreshToken;
+use App\Domain\RefreshToken\Repository\RefreshTokenRepositoryInterface;
 use App\Repository\RepositoryException;
 use App\Service\TokenHasherInterface;
 use Doctrine\DBAL\Connection;

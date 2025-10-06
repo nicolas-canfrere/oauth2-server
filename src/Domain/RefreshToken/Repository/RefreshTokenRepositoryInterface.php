@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\RefreshToken\Repository;
 
-use App\Model\OAuthRefreshToken;
+use App\Domain\RefreshToken\Model\OAuthRefreshToken;
 
 /**
  * Repository interface for OAuth2 refresh token management.

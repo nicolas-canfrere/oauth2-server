@@ -12,9 +12,11 @@ use App\Service\PrivateKeyEncryptionService;
 use App\Service\RateLimiter\RateLimiterService;
 use App\Service\TokenHasher;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
+
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
@@ -80,6 +82,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(GrantHandlerDispatcher::class)
         ->arg('$handlers', tagged_iterator('oauth2.grant_handler'));
 
-    $services->set(\App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler::class)
+    $services->set(App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler::class)
         ->arg('$accessTokenTtl', '%oauth2.client_credentials.access_token_ttl%');
 };
