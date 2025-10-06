@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2;
+namespace App\Application\AccessToken\Enum;
 
 enum GrantType: string
 {
