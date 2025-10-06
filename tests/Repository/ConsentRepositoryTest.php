@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Domain\Consent\Model\UserConsent;
 use App\Infrastructure\Persistance\Doctrine\Repository\ConsentRepository;
-use App\Model\UserConsent;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

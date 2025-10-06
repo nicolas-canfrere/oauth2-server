@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\Consent\Repository;
 
-use App\Model\UserConsent;
+use App\Domain\Consent\Model\UserConsent;
 
 /**
  * Interface for user consent repository operations.

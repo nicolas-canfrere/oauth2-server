@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\UserConsent;
-use App\Repository\ConsentRepositoryInterface;
+use App\Domain\Consent\Model\UserConsent;
+use App\Domain\Consent\Repository\ConsentRepositoryInterface;
 use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
