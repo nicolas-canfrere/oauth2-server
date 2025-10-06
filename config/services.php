@@ -10,7 +10,7 @@ use App\Infrastructure\AccessToken\Service\JwtTokenGenerator;
 use App\Infrastructure\Audit\AuditLogger;
 use App\Infrastructure\Audit\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\Infrastructure\Cli\Command\AuditLogCleanupCommand;
-use App\Service\RateLimiter\RateLimiterService;
+use App\Infrastructure\RateLimiter\RateLimiterService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

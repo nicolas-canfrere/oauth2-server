@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Controller\Example;
 
-use App\Service\RateLimiter\RateLimiterServiceInterface;
+use App\Infrastructure\RateLimiter\RateLimiterServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

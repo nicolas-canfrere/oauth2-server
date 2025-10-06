@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\RateLimiter;
+namespace App\Infrastructure\RateLimiter;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

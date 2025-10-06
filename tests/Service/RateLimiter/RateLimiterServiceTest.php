@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Service\RateLimiter;
 
-use App\Service\RateLimiter\RateLimiterService;
+use App\Infrastructure\RateLimiter\RateLimiterService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
