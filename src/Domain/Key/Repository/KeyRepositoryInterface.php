@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\Key\Repository;
 
-use App\Model\OAuthKey;
+use App\Domain\Key\Model\OAuthKey;
 
 /**
  * Interface for OAuth2 cryptographic key repository operations.

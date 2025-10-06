@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\OAuth2\Service;
 
 use App\Application\AccessToken\DTO\JwtPayloadDTO;
-use App\Repository\KeyRepositoryInterface;
-use App\Service\PrivateKeyEncryptionServiceInterface;
+use App\Domain\Key\Repository\KeyRepositoryInterface;
+use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\ES256;

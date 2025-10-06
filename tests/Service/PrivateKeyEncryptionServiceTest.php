@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Service\PrivateKeyEncryptionService;
+use App\Domain\Key\Service\PrivateKeyEncryptionService;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \App\Service\PrivateKeyEncryptionService
+ * @covers \App\Domain\Key\Service\PrivateKeyEncryptionService
  */
 final class PrivateKeyEncryptionServiceTest extends TestCase
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Domain\Key\Model\OAuthKey;
 use App\Infrastructure\Persistance\Doctrine\Repository\KeyRepository;
-use App\Model\OAuthKey;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

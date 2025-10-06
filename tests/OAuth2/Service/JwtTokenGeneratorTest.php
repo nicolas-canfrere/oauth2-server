@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\OAuth2\Service;
 
 use App\Application\AccessToken\DTO\JwtPayloadDTO;
-use App\Model\OAuthKey;
+use App\Domain\Key\Model\OAuthKey;
+use App\Domain\Key\Repository\KeyRepositoryInterface;
+use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
 use App\OAuth2\Service\JwtTokenGenerator;
-use App\Repository\KeyRepositoryInterface;
-use App\Service\PrivateKeyEncryptionServiceInterface;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\ES256;

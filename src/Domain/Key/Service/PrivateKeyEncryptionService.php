@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\Key\Service;
 
 /**
  * Service for encrypting and decrypting OAuth2 private keys using AES-256-GCM.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\Key\Service;
 
 /**
  * Interface for encrypting and decrypting OAuth2 private keys.

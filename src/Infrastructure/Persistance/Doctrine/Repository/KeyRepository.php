@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\OAuthKey;
-use App\Repository\KeyRepositoryInterface;
+use App\Domain\Key\Model\OAuthKey;
+use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
