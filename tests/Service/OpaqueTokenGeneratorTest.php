@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
-use App\Service\OpaqueTokenGenerator;
+use App\Domain\Security\Service\OpaqueTokenGenerator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \App\Service\OpaqueTokenGenerator
+ * @covers \App\Domain\Security\Service\OpaqueTokenGenerator
  */
 final class OpaqueTokenGeneratorTest extends TestCase
 {

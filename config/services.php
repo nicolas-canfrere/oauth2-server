@@ -5,12 +5,12 @@ declare(strict_types=1);
 use App\Application\AccessToken\GrantHandler\GrantHandlerDispatcher;
 use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionService;
+use App\Domain\Security\Service\TokenHasher;
 use App\Infrastructure\Audit\AuditLogger;
 use App\Infrastructure\Audit\EventSubscriber\OAuth2ExceptionSubscriber;
 use App\Infrastructure\Cli\Command\AuditLogCleanupCommand;
 use App\OAuth2\Service\JwtTokenGenerator;
 use App\Service\RateLimiter\RateLimiterService;
-use App\Service\TokenHasher;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

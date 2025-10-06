@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\Security\Service;
 
 /**
  * Interface for secure token hashing.

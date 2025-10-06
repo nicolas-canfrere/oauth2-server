@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Domain\Security\Service;
 
 /**
  * HMAC-SHA256 token hasher for OAuth2 tokens.

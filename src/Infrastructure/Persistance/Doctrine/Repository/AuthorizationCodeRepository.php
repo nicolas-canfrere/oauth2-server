@@ -6,8 +6,8 @@ namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Domain\AuthorizationCode\Model\OAuthAuthorizationCode;
 use App\Domain\AuthorizationCode\Repository\AuthorizationCodeRepositoryInterface;
+use App\Domain\Security\Service\TokenHasherInterface;
 use App\Domain\Shared\Exception\RepositoryException;
-use App\Service\TokenHasherInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 
