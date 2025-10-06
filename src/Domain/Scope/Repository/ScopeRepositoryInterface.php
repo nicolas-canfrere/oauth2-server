@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\Scope\Repository;
 
-use App\Model\OAuthScope;
+use App\Domain\Scope\Model\OAuthScope;
 
 /**
  * Interface for OAuth2 scope repository operations.

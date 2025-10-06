@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\OAuthScope;
+use App\Domain\Scope\Model\OAuthScope;
+use App\Domain\Scope\Repository\ScopeRepositoryInterface;
 use App\Repository\RepositoryException;
-use App\Repository\ScopeRepositoryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
