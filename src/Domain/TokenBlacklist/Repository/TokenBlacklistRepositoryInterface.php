@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\TokenBlacklist\Repository;
 
-use App\Model\OAuthTokenBlacklist;
+use App\Domain\TokenBlacklist\Model\OAuthTokenBlacklist;
 
 /**
  * Repository interface for OAuth2 token blacklist management.

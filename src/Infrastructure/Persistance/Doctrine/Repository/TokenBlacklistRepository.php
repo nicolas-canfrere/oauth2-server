@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\OAuthTokenBlacklist;
+use App\Domain\TokenBlacklist\Model\OAuthTokenBlacklist;
+use App\Domain\TokenBlacklist\Repository\TokenBlacklistRepositoryInterface;
 use App\Repository\RepositoryException;
-use App\Repository\TokenBlacklistRepositoryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 

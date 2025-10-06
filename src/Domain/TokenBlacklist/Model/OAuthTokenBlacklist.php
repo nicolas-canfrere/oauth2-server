@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Domain\TokenBlacklist\Model;
 
 /**
  * OAuth2 Token Blacklist model.

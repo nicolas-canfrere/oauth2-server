@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Domain\TokenBlacklist\Model\OAuthTokenBlacklist;
 use App\Infrastructure\Persistance\Doctrine\Repository\TokenBlacklistRepository;
-use App\Model\OAuthTokenBlacklist;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
