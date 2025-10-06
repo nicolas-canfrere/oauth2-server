@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\AuthorizationCode\Repository;
 
-use App\Model\OAuthAuthorizationCode;
+use App\Domain\AuthorizationCode\Model\OAuthAuthorizationCode;
 
 /**
  * Repository interface for OAuth2 authorization code management.

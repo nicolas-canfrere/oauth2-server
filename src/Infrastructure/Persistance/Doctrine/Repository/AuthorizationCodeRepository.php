@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
-use App\Model\OAuthAuthorizationCode;
-use App\Repository\AuthorizationCodeRepositoryInterface;
+use App\Domain\AuthorizationCode\Model\OAuthAuthorizationCode;
+use App\Domain\AuthorizationCode\Repository\AuthorizationCodeRepositoryInterface;
 use App\Repository\RepositoryException;
 use App\Service\TokenHasherInterface;
 use Doctrine\DBAL\Connection;

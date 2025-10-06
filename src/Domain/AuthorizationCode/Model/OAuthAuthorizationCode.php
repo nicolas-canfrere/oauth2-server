@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Domain\AuthorizationCode\Model;
 
 /**
  * OAuth2 Authorization Code model.

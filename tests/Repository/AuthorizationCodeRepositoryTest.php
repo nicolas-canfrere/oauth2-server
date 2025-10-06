@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Domain\AuthorizationCode\Model\OAuthAuthorizationCode;
 use App\Infrastructure\Persistance\Doctrine\Repository\AuthorizationCodeRepository;
-use App\Model\OAuthAuthorizationCode;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
