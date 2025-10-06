@@ -6,7 +6,7 @@ namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Domain\Key\Model\OAuthKey;
 use App\Domain\Key\Repository\KeyRepositoryInterface;
-use App\Repository\RepositoryException;
+use App\Domain\Shared\Exception\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;

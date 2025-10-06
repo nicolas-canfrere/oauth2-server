@@ -6,7 +6,7 @@ namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Domain\RefreshToken\Model\OAuthRefreshToken;
 use App\Domain\RefreshToken\Repository\RefreshTokenRepositoryInterface;
-use App\Repository\RepositoryException;
+use App\Domain\Shared\Exception\RepositoryException;
 use App\Service\TokenHasherInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;

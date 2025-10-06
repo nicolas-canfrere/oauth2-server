@@ -7,7 +7,7 @@ namespace App\Infrastructure\Persistance\Doctrine\Repository;
 use App\Domain\Audit\Enum\AuditEventTypeEnum;
 use App\Domain\Audit\Model\OAuthAuditLog;
 use App\Domain\Audit\Repository\AuditLogRepositoryInterface;
-use App\Repository\RepositoryException;
+use App\Domain\Shared\Exception\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;

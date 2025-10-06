@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Domain\Shared\Exception;
 
 /**
  * Exception thrown when repository database operations fail.

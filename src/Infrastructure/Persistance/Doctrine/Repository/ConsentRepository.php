@@ -6,7 +6,7 @@ namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Domain\Consent\Model\UserConsent;
 use App\Domain\Consent\Repository\ConsentRepositoryInterface;
-use App\Repository\RepositoryException;
+use App\Domain\Shared\Exception\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 

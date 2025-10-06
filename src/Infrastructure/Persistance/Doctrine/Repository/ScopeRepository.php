@@ -6,7 +6,7 @@ namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
 use App\Domain\Scope\Model\OAuthScope;
 use App\Domain\Scope\Repository\ScopeRepositoryInterface;
-use App\Repository\RepositoryException;
+use App\Domain\Shared\Exception\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;

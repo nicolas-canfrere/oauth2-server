@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistance\Doctrine\Repository;
 
+use App\Domain\Shared\Exception\RepositoryException;
 use App\Domain\User\Model\User;
 use App\Domain\User\Repository\UserRepositoryInterface;
-use App\Repository\RepositoryException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
