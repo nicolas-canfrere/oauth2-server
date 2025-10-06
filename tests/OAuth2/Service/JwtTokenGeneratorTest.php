@@ -8,7 +8,7 @@ use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Domain\Key\Model\OAuthKey;
 use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
-use App\OAuth2\Service\JwtTokenGenerator;
+use App\Infrastructure\AccessToken\Service\JwtTokenGenerator;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\ES256;
@@ -20,7 +20,7 @@ use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \App\OAuth2\Service\JwtTokenGenerator
+ * @covers \App\Infrastructure\AccessToken\Service\JwtTokenGenerator
  */
 final class JwtTokenGeneratorTest extends TestCase
 {

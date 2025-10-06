@@ -7,10 +7,10 @@ namespace App\Application\AccessToken\GrantHandler;
 use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Application\AccessToken\DTO\TokenResponseDTO;
 use App\Application\AccessToken\Exception\InvalidRequestException;
+use App\Application\AccessToken\Service\JwtTokenGeneratorInterface;
 use App\Domain\OAuthClient\Exception\UnauthorizedClientException;
 use App\Domain\OAuthClient\Model\OAuthClient;
 use App\OAuth2\GrantType;
-use App\OAuth2\Service\JwtTokenGeneratorInterface;
 
 final readonly class ClientCredentialsGrantHandler implements GrantHandlerInterface
 {

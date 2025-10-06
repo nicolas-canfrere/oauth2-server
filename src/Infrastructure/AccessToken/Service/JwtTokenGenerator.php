@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Service;
+namespace App\Infrastructure\AccessToken\Service;
 
 use App\Application\AccessToken\DTO\JwtPayloadDTO;
+use App\Application\AccessToken\Service\JwtTokenGeneratorInterface;
 use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
 use Jose\Component\Core\AlgorithmManager;

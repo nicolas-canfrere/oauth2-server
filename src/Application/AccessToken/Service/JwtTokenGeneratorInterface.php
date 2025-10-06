@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\OAuth2\Service;
+namespace App\Application\AccessToken\Service;
 
 use App\Application\AccessToken\DTO\JwtPayloadDTO;
 

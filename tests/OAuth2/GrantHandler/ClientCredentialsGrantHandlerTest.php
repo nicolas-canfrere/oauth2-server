@@ -7,9 +7,9 @@ namespace App\Tests\OAuth2\GrantHandler;
 use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Application\AccessToken\Exception\InvalidRequestException;
 use App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler;
+use App\Application\AccessToken\Service\JwtTokenGeneratorInterface;
 use App\Domain\OAuthClient\Exception\UnauthorizedClientException;
 use App\OAuth2\GrantType;
-use App\OAuth2\Service\JwtTokenGeneratorInterface;
 use App\Tests\Helper\ClientBuilder;
 use PHPUnit\Framework\TestCase;
 
