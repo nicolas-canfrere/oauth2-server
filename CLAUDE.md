@@ -67,20 +67,56 @@ bin/console                   # Symfony console (inside container)
 
 ## Architecture & Structure
 
-**Standard Symfony 7 structure with Docker orchestration:**
+**Hexagonal Architecture (Ports & Adapters)**
 
-- `src/`: Application code (PSR-4 autoload: `App\`)
-  - `Kernel.php`: MicroKernelTrait-based kernel
-- `config/`: Symfony configuration (YAML-based)
-  - `packages/`: Bundle configurations
-  - `routes/`: Route definitions
-- `tests/`: PHPUnit tests (PSR-4: `App\Tests\`)
-- `migrations/`: Doctrine migration files
-- `public/`: Web root
-- `bin/`: Executable scripts (console, phpunit)
-- `docker/`: Docker configuration files
-- `var/`: Cache, logs (gitignored)
-- `vendor/`: Composer dependencies (gitignored)
+This project follows hexagonal architecture principles with clear separation of concerns:
+
+```
+src/
+├── Domain/                      # Business logic (core)
+│   ├── OAuthClient/            # Client aggregate
+│   │   ├── Model/              # Domain models (readonly classes)
+│   │   ├── Repository/         # Repository interfaces (ports)
+│   │   ├── Service/            # Domain services
+│   │   ├── Security/           # Client authentication logic
+│   │   └── Exception/          # Domain-specific exceptions
+│   ├── User/                   # User aggregate
+│   ├── Audit/                  # Audit logging aggregate
+│   ├── AuthorizationCode/      # Authorization code aggregate
+│   ├── RefreshToken/           # Refresh token aggregate
+│   ├── TokenBlacklist/         # Token blacklist aggregate
+│   ├── Scope/                  # OAuth scopes aggregate
+│   ├── Key/                    # Cryptographic keys aggregate
+│   ├── Consent/                # User consent aggregate
+│   ├── Security/               # Security services (TokenHasher, OpaqueTokenGenerator)
+│   └── Shared/                 # Shared domain components
+│       └── Exception/          # Shared exceptions (RepositoryException)
+│
+├── Application/                 # Use cases & orchestration
+│   └── AccessToken/
+│       ├── UseCase/            # Application use cases (orchestrate domain logic)
+│       ├── GrantHandler/       # OAuth2 grant type handlers
+│       ├── Service/            # Application services (JwtTokenGenerator)
+│       ├── DTO/                # Data Transfer Objects
+│       ├── Enum/               # Application enums (GrantType)
+│       └── Exception/          # Application-level exceptions
+│
+└── Infrastructure/              # External adapters
+    ├── Persistance/Doctrine/   # Database adapters (DBAL implementations)
+    │   └── Repository/         # Concrete repository implementations
+    ├── Http/Controller/        # HTTP endpoints (Symfony controllers)
+    ├── Cli/Command/            # Console commands
+    ├── Audit/                  # Audit infrastructure (AuditLogger, EventSubscribers)
+    ├── RateLimiter/            # Rate limiting service (Redis)
+    ├── Security/               # Symfony Security integration
+    └── AccessToken/Service/    # JWT token generation infrastructure
+```
+
+**Dependency Flow (Hexagonal Architecture):**
+- **Domain** ← Application ← Infrastructure
+- Domain has NO dependencies on Application or Infrastructure
+- Application depends ONLY on Domain interfaces (ports)
+- Infrastructure implements Domain interfaces (adapters)
 
 **Key Configuration Files:**
 - `compose.yaml`: Main Docker setup (nginx, php, postgres, redis)
@@ -133,6 +169,11 @@ bin/console                   # Symfony console (inside container)
 4. **Code quality gates**: Run `make static-code-analysis` and `make apply-cs` before commits
 5. **Test isolation**: Tests run in separate Docker environment with fresh database
 6. **Symfony conventions**: Follow Symfony best practices for services, routing, configuration
+7. **Hexagonal architecture rules**:
+   - Domain layer NEVER imports from Application or Infrastructure
+   - Application layer imports ONLY from Domain
+   - Infrastructure layer implements Domain interfaces
+   - New features: start with Domain (models, interfaces), then Application (use cases), then Infrastructure (adapters)
 
 ## Database Layer Architecture
 
@@ -161,40 +202,21 @@ This project uses **Doctrine DBAL exclusively** for database operations. We deli
   - No database dependency for ID generation
   - Zero ID collision risk in distributed architectures
 
-### Repository Pattern
+### Repository Pattern (Hexagonal Implementation)
 
-**Structure:**
+**Repository interfaces are ports (Domain layer), implementations are adapters (Infrastructure layer):**
+
 ```
-src/
-├── Model/                    # Plain PHP readonly classes (no Doctrine annotations)
-│   ├── OAuthClient.php
-│   ├── OAuthAuthorizationCode.php
-│   ├── OAuthRefreshToken.php
-│   ├── OAuthTokenBlacklist.php
-│   └── OAuthAuditLog.php
-├── Repository/               # DBAL implementations with interfaces
-│   ├── ClientRepositoryInterface.php
-│   ├── ClientRepository.php
-│   ├── AuthorizationCodeRepositoryInterface.php
-│   ├── AuthorizationCodeRepository.php
-│   ├── RefreshTokenRepositoryInterface.php
-│   ├── RefreshTokenRepository.php
-│   ├── TokenBlacklistRepositoryInterface.php
-│   ├── TokenBlacklistRepository.php
-│   ├── AuditLogRepositoryInterface.php
-│   └── AuditLogRepository.php
-├── Service/                  # Application services
-│   ├── TokenHasherInterface.php
-│   ├── TokenHasher.php
-│   ├── AuditLoggerInterface.php
-│   └── AuditLogger.php
-├── DTO/                      # Data Transfer Objects
-│   └── AuditEventDTO.php
-├── Enum/                     # Enumerations
-│   └── AuditEventTypeEnum.php
-└── Command/                  # Console commands
-    └── AuditLogCleanupCommand.php
+Domain Layer (Ports):
+src/Domain/{Aggregate}/Repository/{Aggregate}RepositoryInterface.php
+
+Infrastructure Layer (Adapters):
+src/Infrastructure/Persistance/Doctrine/Repository/{Aggregate}Repository.php
 ```
+
+**Example:**
+- `src/Domain/OAuthClient/Repository/ClientRepositoryInterface.php` (port)
+- `src/Infrastructure/Persistance/Doctrine/Repository/ClientRepository.php` (adapter)
 
 **Repository Guidelines:**
 1. **Interface First**: Always define repository interface before implementation

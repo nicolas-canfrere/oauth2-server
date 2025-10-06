@@ -90,26 +90,47 @@ make composer-cli
 bin/console
 ```
 
-## Project Structure
+## Architecture
+
+This project follows **Hexagonal Architecture (Ports & Adapters)** with clear separation of concerns:
 
 ```
-├── bin/                    # Executable scripts
-├── config/                 # Symfony configuration
-│   ├── packages/          # Bundle configurations
-│   └── routes/            # Route definitions
-├── docker/                # Docker configuration
-├── docs/                  # Project documentation
-├── migrations/            # Doctrine migrations
-├── public/                # Web root
-├── src/                   # Application code (PSR-4: App\)
-│   ├── Model/            # Plain PHP readonly classes (no annotations)
-│   ├── Repository/       # DBAL repositories with interfaces
-│   ├── Service/          # Application services
-│   └── Kernel.php        # Application kernel
-├── tests/                 # PHPUnit tests (PSR-4: App\Tests\)
-├── var/                   # Cache, logs (gitignored)
-└── vendor/                # Dependencies (gitignored)
+src/
+├── Domain/                      # Business logic (core)
+│   ├── OAuthClient/            # Client aggregate
+│   ├── User/                   # User aggregate
+│   ├── Audit/                  # Audit logging aggregate
+│   ├── AuthorizationCode/      # Authorization code aggregate
+│   ├── RefreshToken/           # Refresh token aggregate
+│   ├── TokenBlacklist/         # Token blacklist aggregate
+│   ├── Scope/                  # OAuth scopes aggregate
+│   ├── Key/                    # Cryptographic keys aggregate
+│   ├── Consent/                # User consent aggregate
+│   ├── Security/               # Security services
+│   └── Shared/                 # Shared domain components
+│
+├── Application/                 # Use cases & orchestration
+│   └── AccessToken/
+│       ├── UseCase/            # Application use cases
+│       ├── GrantHandler/       # OAuth2 grant handlers
+│       ├── Service/            # Application services
+│       ├── DTO/                # Data Transfer Objects
+│       └── Exception/          # Application exceptions
+│
+└── Infrastructure/              # External adapters
+    ├── Persistance/Doctrine/   # Database adapters (DBAL)
+    ├── Http/Controller/        # HTTP endpoints
+    ├── Cli/Command/            # Console commands
+    ├── Audit/                  # Audit logging infrastructure
+    ├── RateLimiter/            # Rate limiting (Redis)
+    └── Security/               # Symfony Security integration
 ```
+
+**Dependency Flow:**
+- Domain ← Application ← Infrastructure
+- Domain has NO dependencies on Application or Infrastructure
+- Application depends ONLY on Domain interfaces (ports)
+- Infrastructure implements Domain interfaces (adapters)
 
 ## Coding Standards
 
@@ -136,8 +157,6 @@ All commands run inside Docker containers. Never run PHP/Composer commands direc
 - All services use Alpine Linux 3.22
 - Health checks for database and redis
 - Persistent volumes for data
-
-## Architecture
 
 ### DBAL-Only Pattern (No ORM)
 
