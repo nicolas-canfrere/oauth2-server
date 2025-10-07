@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler;
 use App\Application\AccessToken\GrantHandler\GrantHandlerDispatcher;
 use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;
+use App\Domain\Key\Service\KeyGenerator;
+use App\Domain\Key\Service\KeyGeneratorHandlerInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionService;
 use App\Domain\Security\Service\TokenHasher;
 use App\Infrastructure\AccessToken\Service\JwtTokenGenerator;
@@ -33,6 +36,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->defaults()
         ->autowire()
         ->autoconfigure();
+
+    $services->instanceof(KeyGeneratorHandlerInterface::class)
+        ->tag('oauth2.key_generator');
+
+    $services->instanceof(GrantHandlerInterface::class)
+        ->tag('oauth2.grant_handler');
 
     $services->load('App\\', __DIR__ . '/../src/')
         ->exclude([
@@ -73,15 +82,15 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(PrivateKeyEncryptionService::class)
         ->arg('$encryptionKey', '%env(PRIVATE_KEY_ENCRYPTION_KEY)%');
 
+    $services->set(KeyGenerator::class)
+        ->arg('$handlers', tagged_iterator('oauth2.key_generator'));
+
     $services->set(JwtTokenGenerator::class)
         ->arg('$issuer', '%oauth2.issuer%');
-
-    $services->instanceof(GrantHandlerInterface::class)
-        ->tag('oauth2.grant_handler');
 
     $services->set(GrantHandlerDispatcher::class)
         ->arg('$handlers', tagged_iterator('oauth2.grant_handler'));
 
-    $services->set(App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler::class)
+    $services->set(ClientCredentialsGrantHandler::class)
         ->arg('$accessTokenTtl', '%oauth2.client_credentials.access_token_ttl%');
 };

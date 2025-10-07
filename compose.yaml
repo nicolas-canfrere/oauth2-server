@@ -9,6 +9,8 @@ services:
       - '8000:80'
     depends_on:
       - php
+    networks:
+      - oauth2
 
   php:
     image: oauth2-server:dev
@@ -19,6 +21,8 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
+    networks:
+      - oauth2
     depends_on:
       database:
         condition: service_healthy
@@ -40,6 +44,8 @@ services:
       - database_data:/var/lib/postgresql/data:rw
     ports:
       - "9876:5432"
+    networks:
+      - oauth2
 
   redis:
     image: redis:8.2.1-alpine3.22
@@ -53,7 +59,13 @@ services:
       - redis_data:/data:rw
     ports:
       - "9736:6379"
+    networks:
+      - oauth2
 
 volumes:
   database_data:
   redis_data:
+
+networks:
+  oauth2:
+    driver: bridge
