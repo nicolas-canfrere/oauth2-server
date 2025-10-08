@@ -21,13 +21,7 @@ final readonly class UserPasswordHasher implements UserPasswordHasherInterface
             throw new \InvalidArgumentException('Cannot hash empty password.');
         }
 
-        /** @var string|false $hash */
-        $hash = $this->userPasswordHasher->hashPassword($this->createSecurityUser(), $plainPassword);
-        if (false === $hash) {
-            throw new \RuntimeException('Unable to hash user password with the configured algorithm.');
-        }
-
-        return $hash;
+        return $this->userPasswordHasher->hashPassword($this->createSecurityUser(), $plainPassword);
     }
 
     private function createSecurityUser(): SecurityUser
