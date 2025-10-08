@@ -244,6 +244,33 @@ readonly class AuditEventDTO
     }
 
     /**
+     * Creates an audit event for OAuth client creation.
+     *
+     * @param array<string, mixed> $additionalContext
+     */
+    public static function clientCreated(
+        string $clientId,
+        string $clientName,
+        ?string $userId = null,
+        ?string $ipAddress = null,
+        ?string $userAgent = null,
+        array $additionalContext = [],
+    ): self {
+        return new self(
+            eventType: AuditEventTypeEnum::CLIENT_CREATED,
+            level: 'info',
+            message: sprintf('OAuth2 client "%s" created', $clientName),
+            context: array_merge([
+                'client_name' => $clientName,
+            ], $additionalContext),
+            userId: $userId,
+            clientId: $clientId,
+            ipAddress: $ipAddress,
+            userAgent: $userAgent
+        );
+    }
+
+    /**
      * Converts DTO to array for JSON serialization.
      *
      * @return array<string, mixed>

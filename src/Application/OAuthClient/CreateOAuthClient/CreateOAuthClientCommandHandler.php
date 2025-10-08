@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Application\OAuthClient\CreateOAuthClient;
 
+use App\Domain\OAuthClient\Event\OAuthClientCreatedEvent;
 use App\Domain\OAuthClient\Model\OAuthClient;
 use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
 use App\Domain\OAuthClient\Service\ClientSecretGeneratorInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Uid\Uuid;
 
 final readonly class CreateOAuthClientCommandHandler
@@ -14,6 +16,7 @@ final readonly class CreateOAuthClientCommandHandler
     public function __construct(
         private ClientRepositoryInterface $clientRepository,
         private ClientSecretGeneratorInterface $clientSecretGenerator,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -52,6 +55,19 @@ final readonly class CreateOAuthClientCommandHandler
         );
 
         $this->clientRepository->create($client);
+
+        // Dispatch domain event for client creation
+        $this->eventDispatcher->dispatch(
+            new OAuthClientCreatedEvent(
+                clientId: $clientId,
+                clientName: $command->name,
+                redirectUri: $command->redirectUri,
+                grantTypes: $grantTypes,
+                scopes: $scopes,
+                isConfidential: $command->isConfidential,
+                pkceRequired: $command->pkceRequired,
+            )
+        );
 
         return [
             'client_id' => $clientId,

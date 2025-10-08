@@ -11,6 +11,7 @@ use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
 use App\Domain\OAuthClient\Service\ClientSecretGeneratorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @covers \App\Application\OAuthClient\CreateOAuthClient\CreateOAuthClientCommandHandler
@@ -19,16 +20,19 @@ final class CreateOAuthClientCommandHandlerTest extends TestCase
 {
     private ClientRepositoryInterface&MockObject $clientRepository;
     private ClientSecretGeneratorInterface&MockObject $secretGenerator;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private CreateOAuthClientCommandHandler $handler;
 
     protected function setUp(): void
     {
         $this->clientRepository = $this->createMock(ClientRepositoryInterface::class);
         $this->secretGenerator = $this->createMock(ClientSecretGeneratorInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->handler = new CreateOAuthClientCommandHandler(
             $this->clientRepository,
             $this->secretGenerator,
+            $this->eventDispatcher,
         );
     }
 
