@@ -43,13 +43,13 @@ final readonly class JwtPayloadDTO
      * and OAuth2-specific claims (scope, client_id).
      *
      * @param string $issuer The issuer claim (iss) - OAuth2 server URL
+     * @param string $jti    The JWT ID (jti) - unique identifier for the token
      *
      * @return array<string, mixed> Array of JWT claims ready for encoding
      */
-    public function toClaims(string $issuer): array
+    public function toClaims(string $issuer, string $jti): array
     {
         $now = time();
-        $jti = \Symfony\Component\Uid\Uuid::v4()->toRfc4122();
 
         /** @var array<string, mixed> $claims */
         $claims = [

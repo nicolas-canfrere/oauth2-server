@@ -8,6 +8,7 @@ use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Domain\Key\Model\OAuthKey;
 use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use App\Infrastructure\AccessToken\Service\JwtTokenGenerator;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
@@ -28,6 +29,7 @@ final class JwtTokenGeneratorTest extends TestCase
 
     private KeyRepositoryInterface $keyRepository;
     private PrivateKeyEncryptionServiceInterface $privateKeyEncryption;
+    private IdentityFactoryInterface $identityFactory;
     private JwtTokenGenerator $generator;
 
     protected function setUp(): void
@@ -40,9 +42,16 @@ final class JwtTokenGeneratorTest extends TestCase
         $privateKeyEncryption = $this->createMock(PrivateKeyEncryptionServiceInterface::class);
         $this->privateKeyEncryption = $privateKeyEncryption;
 
+        /** @var IdentityFactoryInterface&\PHPUnit\Framework\MockObject\MockObject $identityFactory */
+        $identityFactory = $this->createMock(IdentityFactoryInterface::class);
+        $this->identityFactory = $identityFactory;
+
+        $this->identityFactory->method('generate')->willReturn('550e8400-e29b-41d4-a716-446655440000');
+
         $this->generator = new JwtTokenGenerator(
             $this->keyRepository,
             $this->privateKeyEncryption,
+            $this->identityFactory,
             self::ISSUER
         );
     }

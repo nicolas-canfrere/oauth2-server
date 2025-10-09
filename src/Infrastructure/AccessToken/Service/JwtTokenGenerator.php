@@ -8,6 +8,7 @@ use App\Application\AccessToken\DTO\JwtPayloadDTO;
 use App\Application\AccessToken\Service\JwtTokenGeneratorInterface;
 use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\ES256;
@@ -37,6 +38,7 @@ final readonly class JwtTokenGenerator implements JwtTokenGeneratorInterface
     public function __construct(
         private KeyRepositoryInterface $keyRepository,
         private PrivateKeyEncryptionServiceInterface $privateKeyEncryption,
+        private IdentityFactoryInterface $identityFactory,
         private string $issuer,
     ) {
         // Initialize algorithm manager with all supported signature algorithms
@@ -71,8 +73,11 @@ final readonly class JwtTokenGenerator implements JwtTokenGeneratorInterface
         // Convert PEM private key to JWK format
         $jwk = $this->createJwkFromPem($privateKeyPem, $oauthKey->algorithm, $oauthKey->kid);
 
+        // Generate unique JWT ID
+        $jti = $this->identityFactory->generate();
+
         // Convert payload DTO to JWT claims
-        $claims = $payload->toClaims($this->issuer);
+        $claims = $payload->toClaims($this->issuer, $jti);
 
         // Build the JWS (JSON Web Signature)
         $jwsBuilder = new JWSBuilder($this->algorithmManager);
