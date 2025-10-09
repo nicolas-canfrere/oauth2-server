@@ -9,9 +9,12 @@ use App\Application\AccessToken\Enum\GrantType;
 use App\Application\AccessToken\Exception\InvalidRequestException;
 use App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler;
 use App\Application\AccessToken\Service\JwtTokenGeneratorInterface;
+use App\Domain\AccessToken\Event\AccessTokenIssuedEvent;
 use App\Domain\OAuthClient\Exception\UnauthorizedClientException;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use App\Tests\Helper\ClientBuilder;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 final class ClientCredentialsGrantHandlerTest extends TestCase
 {
@@ -19,13 +22,19 @@ final class ClientCredentialsGrantHandlerTest extends TestCase
 
     private ClientCredentialsGrantHandler $handler;
     private JwtTokenGeneratorInterface $jwtTokenGenerator;
+    private IdentityFactoryInterface $identityFactory;
+    private EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
         $this->jwtTokenGenerator = $this->createMock(JwtTokenGeneratorInterface::class);
+        $this->identityFactory = $this->createMock(IdentityFactoryInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->handler = new ClientCredentialsGrantHandler(
             $this->jwtTokenGenerator,
+            $this->identityFactory,
+            $this->eventDispatcher,
             self::CLIENT_CREDENTIALS_ACCESS_TOKEN_TTL
         );
     }
@@ -41,6 +50,10 @@ final class ClientCredentialsGrantHandlerTest extends TestCase
     {
         $client = (new ClientBuilder())->confidential()->withScopes(['read', 'write'])->build();
 
+        $this->identityFactory->expects(self::once())
+            ->method('generate')
+            ->willReturn('test-jti-123');
+
         $this->jwtTokenGenerator->expects(self::once())
             ->method('generate')
             ->with(self::callback(function (JwtPayloadDTO $payload) use ($client) {
@@ -50,6 +63,16 @@ final class ClientCredentialsGrantHandlerTest extends TestCase
                     && self::CLIENT_CREDENTIALS_ACCESS_TOKEN_TTL === $payload->expiresIn;
             }))
             ->willReturn('generated-jwt');
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::callback(function (AccessTokenIssuedEvent $event) use ($client) {
+                return $event->userId === $client->clientId
+                    && $event->clientId === $client->clientId
+                    && $event->grantType === GrantType::CLIENT_CREDENTIALS->value
+                    && $event->scopes === ['read']
+                    && 'test-jti-123' === $event->jti;
+            }));
 
         $response = $this->handler->handle(['scope' => 'read'], $client);
 

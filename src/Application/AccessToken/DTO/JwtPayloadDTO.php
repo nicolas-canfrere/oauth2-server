@@ -21,6 +21,7 @@ final readonly class JwtPayloadDTO
      * @param string      $scope           Space-separated list of scopes granted
      * @param int         $expiresIn       Token lifetime in seconds
      * @param string|null $clientId        OAuth2 client identifier (optional)
+     * @param string|null $jti             JWT ID (jti) - if provided, will be used instead of auto-generated (optional)
      * @param int|null    $notBefore       Not Before timestamp (nbf) - token not valid before this time (optional)
      * @param array<string, mixed> $additionalClaims Additional custom claims (optional)
      */
@@ -30,6 +31,7 @@ final readonly class JwtPayloadDTO
         public string $scope,
         public int $expiresIn,
         public ?string $clientId = null,
+        public ?string $jti = null,
         public ?int $notBefore = null,
         public array $additionalClaims = [],
     ) {
@@ -42,14 +44,17 @@ final readonly class JwtPayloadDTO
      * Generates standard JWT claims (iss, sub, aud, exp, iat, jti, nbf)
      * and OAuth2-specific claims (scope, client_id).
      *
-     * @param string $issuer The issuer claim (iss) - OAuth2 server URL
-     * @param string $jti    The JWT ID (jti) - unique identifier for the token
+     * @param string      $issuer The issuer claim (iss) - OAuth2 server URL
+     * @param string|null $jti    The JWT ID (jti) - unique identifier (optional, uses DTO jti if not provided)
      *
      * @return array<string, mixed> Array of JWT claims ready for encoding
      */
-    public function toClaims(string $issuer, string $jti): array
+    public function toClaims(string $issuer, ?string $jti = null): array
     {
         $now = time();
+
+        // Use provided jti parameter, or fall back to DTO jti (which might also be null)
+        $effectiveJti = $jti ?? $this->jti;
 
         /** @var array<string, mixed> $claims */
         $claims = [
@@ -58,9 +63,13 @@ final readonly class JwtPayloadDTO
             'aud' => $this->audience,                   // Audience (client ID)
             'exp' => $now + $this->expiresIn,          // Expiration time
             'iat' => $now,                              // Issued at
-            'jti' => $jti,                              // JWT ID (unique identifier)
             'scope' => $this->scope,                    // OAuth2 scopes
         ];
+
+        // Add jti if provided (either via parameter or DTO property)
+        if (null !== $effectiveJti) {
+            $claims['jti'] = $effectiveJti;
+        }
 
         // Add optional claims
         if (null !== $this->notBefore) {

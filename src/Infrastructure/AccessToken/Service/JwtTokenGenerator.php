@@ -73,8 +73,8 @@ final readonly class JwtTokenGenerator implements JwtTokenGeneratorInterface
         // Convert PEM private key to JWK format
         $jwk = $this->createJwkFromPem($privateKeyPem, $oauthKey->algorithm, $oauthKey->kid);
 
-        // Generate unique JWT ID
-        $jti = $this->identityFactory->generate();
+        // Generate unique JWT ID if not already provided in payload
+        $jti = $payload->jti ?? $this->identityFactory->generate();
 
         // Convert payload DTO to JWT claims
         $claims = $payload->toClaims($this->issuer, $jti);

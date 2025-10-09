@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Application\AccessToken\GrantHandler\AuthorizationCodeGrantHandler;
 use App\Application\AccessToken\GrantHandler\ClientCredentialsGrantHandler;
 use App\Application\AccessToken\GrantHandler\GrantHandlerDispatcher;
 use App\Application\AccessToken\GrantHandler\GrantHandlerInterface;
@@ -30,6 +31,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $parameters->set('oauth2.access_token_ttl', '%env(int:ACCESS_TOKEN_TTL)%');
     $parameters->set('oauth2.client_credentials.access_token_ttl', '%env(int:CLIENT_CREDENTIALS_ACCESS_TOKEN_TTL)%');
+    $parameters->set('oauth2.refresh_token_ttl', '%env(int:REFRESH_TOKEN_TTL)%');
 
     $services = $containerConfigurator->services();
 
@@ -93,4 +95,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->set(ClientCredentialsGrantHandler::class)
         ->arg('$accessTokenTtl', '%oauth2.client_credentials.access_token_ttl%');
+
+    $services->set(AuthorizationCodeGrantHandler::class)
+        ->arg('$accessTokenTtl', '%oauth2.access_token_ttl%')
+        ->arg('$refreshTokenTtl', '%oauth2.refresh_token_ttl%');
 };

@@ -9,13 +9,18 @@ use App\Application\AccessToken\DTO\TokenResponseDTO;
 use App\Application\AccessToken\Enum\GrantType;
 use App\Application\AccessToken\Exception\InvalidRequestException;
 use App\Application\AccessToken\Service\JwtTokenGeneratorInterface;
+use App\Domain\AccessToken\Event\AccessTokenIssuedEvent;
 use App\Domain\OAuthClient\Exception\UnauthorizedClientException;
 use App\Domain\OAuthClient\Model\OAuthClient;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 final readonly class ClientCredentialsGrantHandler implements GrantHandlerInterface
 {
     public function __construct(
         private JwtTokenGeneratorInterface $jwtTokenGenerator,
+        private IdentityFactoryInterface $identityFactory,
+        private EventDispatcherInterface $eventDispatcher,
         private int $accessTokenTtl,
     ) {
     }
@@ -37,14 +42,26 @@ final readonly class ClientCredentialsGrantHandler implements GrantHandlerInterf
         $scopeString = implode(' ', $scopes);
 
         // For client credentials, the subject of the token is the client itself.
+        $jti = $this->identityFactory->generate();
         $payload = new JwtPayloadDTO(
             $client->clientId,
             $client->clientId,
             $scopeString,
-            $this->accessTokenTtl
+            $this->accessTokenTtl,
+            $client->clientId, // clientId parameter
+            $jti // Pass JTI to ensure it matches the one in the event
         );
 
         $accessToken = $this->jwtTokenGenerator->generate($payload);
+
+        // Dispatch domain event for audit logging
+        $this->eventDispatcher->dispatch(new AccessTokenIssuedEvent(
+            $client->clientId, // For client_credentials, userId is the clientId
+            $client->clientId,
+            GrantType::CLIENT_CREDENTIALS->value,
+            $scopes,
+            $jti
+        ));
 
         return new TokenResponseDTO(
             $accessToken,
