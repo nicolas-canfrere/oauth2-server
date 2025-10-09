@@ -52,6 +52,12 @@ return static function (ContainerConfigurator $containerConfigurator): void {
             __DIR__ . '/../src/Infrastructure/Security/User/',
         ]);
 
+    $services->load(
+        'App\Infrastructure\Http\Controller\\',
+        __DIR__ . '/../src/Infrastructure/Http/Controller/**/*Controller.php'
+    )
+        ->tag('controller.service_arguments');
+
     $services->set(TokenHasher::class)
         ->arg('$secret', '%env(APP_SECRET)%');
 
