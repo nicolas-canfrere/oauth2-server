@@ -8,14 +8,15 @@ use App\Domain\OAuthClient\Event\OAuthClientCreatedEvent;
 use App\Domain\OAuthClient\Model\OAuthClient;
 use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
 use App\Domain\OAuthClient\Service\ClientSecretGeneratorInterface;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Uid\Uuid;
 
 final readonly class CreateOAuthClientCommandHandler
 {
     public function __construct(
         private ClientRepositoryInterface $clientRepository,
         private ClientSecretGeneratorInterface $clientSecretGenerator,
+        private IdentityFactoryInterface $identityFactory,
         private EventDispatcherInterface $eventDispatcher,
     ) {
     }
@@ -26,7 +27,7 @@ final readonly class CreateOAuthClientCommandHandler
     public function __invoke(CreateOAuthClientCommand $command): array
     {
         $now = new \DateTimeImmutable();
-        $clientId = $command->clientId ?? Uuid::v4()->toString();
+        $clientId = $command->clientId ?? $this->identityFactory->generate();
 
         $grantTypes = array_values(array_filter($command->grantTypes, 'is_string'));
         $scopes = array_values(array_filter($command->scopes, 'is_string'));
@@ -42,7 +43,7 @@ final readonly class CreateOAuthClientCommandHandler
         }
 
         $client = new OAuthClient(
-            id: Uuid::v4()->toString(),
+            id: $this->identityFactory->generate(),
             clientId: $clientId,
             clientSecretHash: $clientSecretHash,
             name: $command->name,

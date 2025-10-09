@@ -12,6 +12,7 @@ use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Domain\Key\Service\KeyGeneratorInterface;
 use App\Domain\Key\Service\KeyPairDTO;
 use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -23,6 +24,7 @@ final class CreateKeyCommandHandlerTest extends TestCase
     private KeyGeneratorInterface&MockObject $keyGenerator;
     private PrivateKeyEncryptionServiceInterface&MockObject $privateKeyEncryption;
     private KeyRepositoryInterface&MockObject $keyRepository;
+    private IdentityFactoryInterface&MockObject $identityFactory;
     private CreateKeyCommandHandler $handler;
 
     protected function setUp(): void
@@ -30,11 +32,19 @@ final class CreateKeyCommandHandlerTest extends TestCase
         $this->keyGenerator = $this->createMock(KeyGeneratorInterface::class);
         $this->privateKeyEncryption = $this->createMock(PrivateKeyEncryptionServiceInterface::class);
         $this->keyRepository = $this->createMock(KeyRepositoryInterface::class);
+        $this->identityFactory = $this->createMock(IdentityFactoryInterface::class);
+
+        $this->identityFactory->method('generate')
+            ->willReturnOnConsecutiveCalls(
+                '550e8400-e29b-41d4-a716-446655440000',
+                '550e8400-e29b-41d4-a716-446655440001'
+            );
 
         $this->handler = new CreateKeyCommandHandler(
             $this->keyGenerator,
             $this->privateKeyEncryption,
-            $this->keyRepository
+            $this->keyRepository,
+            $this->identityFactory
         );
     }
 

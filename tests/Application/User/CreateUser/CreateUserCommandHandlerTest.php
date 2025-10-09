@@ -6,6 +6,7 @@ namespace App\Tests\Application\User\CreateUser;
 
 use App\Application\User\CreateUser\CreateUserCommand;
 use App\Application\User\CreateUser\CreateUserCommandHandler;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use App\Domain\User\Model\User;
 use App\Domain\User\Repository\UserRepositoryInterface;
 use App\Domain\User\Service\UserPasswordHasherInterface;
@@ -19,15 +20,21 @@ final class CreateUserCommandHandlerTest extends TestCase
 {
     private UserRepositoryInterface&MockObject $userRepository;
     private UserPasswordHasherInterface&MockObject $passwordHasher;
+    private IdentityFactoryInterface&MockObject $identityFactory;
     private CreateUserCommandHandler $handler;
 
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepositoryInterface::class);
         $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $this->identityFactory = $this->createMock(IdentityFactoryInterface::class);
+
+        $this->identityFactory->method('generate')
+            ->willReturn('550e8400-e29b-41d4-a716-446655440000');
 
         $this->handler = new CreateUserCommandHandler(
             $this->passwordHasher,
+            $this->identityFactory,
             $this->userRepository,
         );
     }

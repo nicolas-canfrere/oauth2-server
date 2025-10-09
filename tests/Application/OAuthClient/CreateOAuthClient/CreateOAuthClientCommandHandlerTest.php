@@ -9,6 +9,7 @@ use App\Application\OAuthClient\CreateOAuthClient\CreateOAuthClientCommandHandle
 use App\Domain\OAuthClient\Model\OAuthClient;
 use App\Domain\OAuthClient\Repository\ClientRepositoryInterface;
 use App\Domain\OAuthClient\Service\ClientSecretGeneratorInterface;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -20,6 +21,7 @@ final class CreateOAuthClientCommandHandlerTest extends TestCase
 {
     private ClientRepositoryInterface&MockObject $clientRepository;
     private ClientSecretGeneratorInterface&MockObject $secretGenerator;
+    private IdentityFactoryInterface&MockObject $identityFactory;
     private EventDispatcherInterface&MockObject $eventDispatcher;
     private CreateOAuthClientCommandHandler $handler;
 
@@ -27,11 +29,19 @@ final class CreateOAuthClientCommandHandlerTest extends TestCase
     {
         $this->clientRepository = $this->createMock(ClientRepositoryInterface::class);
         $this->secretGenerator = $this->createMock(ClientSecretGeneratorInterface::class);
+        $this->identityFactory = $this->createMock(IdentityFactoryInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->identityFactory->method('generate')
+            ->willReturnOnConsecutiveCalls(
+                '550e8400-e29b-41d4-a716-446655440000',
+                '550e8400-e29b-41d4-a716-446655440001'
+            );
 
         $this->handler = new CreateOAuthClientCommandHandler(
             $this->clientRepository,
             $this->secretGenerator,
+            $this->identityFactory,
             $this->eventDispatcher,
         );
     }

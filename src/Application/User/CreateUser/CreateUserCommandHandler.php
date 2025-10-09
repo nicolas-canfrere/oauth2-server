@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Application\User\CreateUser;
 
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use App\Domain\User\Model\User;
 use App\Domain\User\Repository\UserRepositoryInterface;
 use App\Domain\User\Service\UserPasswordHasherInterface;
-use Symfony\Component\Uid\Uuid;
 
 final readonly class CreateUserCommandHandler
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
+        private IdentityFactoryInterface $identityFactory,
         private UserRepositoryInterface $userRepository,
     ) {
     }
@@ -41,7 +42,7 @@ final readonly class CreateUserCommandHandler
 
         $passwordHash = $this->passwordHasher->hash($command->plainPassword);
 
-        $userId = $command->userId ?? Uuid::v4()->toString();
+        $userId = $command->userId ?? $this->identityFactory->generate();
         $now = new \DateTimeImmutable();
 
         $roles = array_values(array_filter(

@@ -9,7 +9,7 @@ use App\Domain\Key\Model\OAuthKey;
 use App\Domain\Key\Repository\KeyRepositoryInterface;
 use App\Domain\Key\Service\KeyGeneratorInterface;
 use App\Domain\Key\Service\PrivateKeyEncryptionServiceInterface;
-use Symfony\Component\Uid\Uuid;
+use App\Domain\Shared\Factory\IdentityFactoryInterface;
 
 final readonly class CreateKeyCommandHandler
 {
@@ -17,6 +17,7 @@ final readonly class CreateKeyCommandHandler
         private KeyGeneratorInterface $keyGeneratorService,
         private PrivateKeyEncryptionServiceInterface $privateKeyEncryptionService,
         private KeyRepositoryInterface $keyRepository,
+        private IdentityFactoryInterface $identityFactory,
     ) {
     }
 
@@ -29,8 +30,8 @@ final readonly class CreateKeyCommandHandler
         $keyPair = $this->keyGeneratorService->generateKeyPair($keyAlgorithm);
 
         $oauthKey = new OAuthKey(
-            Uuid::v4()->toString(),
-            Uuid::v4()->toString(),
+            $this->identityFactory->generate(),
+            $this->identityFactory->generate(),
             $keyAlgorithm->value,
             $keyPair->publicKey,
             $this->privateKeyEncryptionService->encrypt($keyPair->privateKey),
