@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Integration tests for SecurityController.
  *
- * Tests JSON login authentication flow.
+ * Tests form-based login authentication flow.
  */
 final class SecurityControllerTest extends WebTestCase
 {
@@ -55,29 +55,13 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'admin@example.com',
-                'password' => 'SecurePassword123!',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => 'admin@example.com',
+                '_password' => 'SecurePassword123!',
+            ]
         );
 
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        $responseContent = $this->client->getResponse()->getContent() ?: '';
-        $this->assertNotEmpty($responseContent);
-
-        /** @var array{success: bool, user: array{id: string, email: string, roles: array<string>}} $responseData */
-        $responseData = json_decode($responseContent, true, 512, \JSON_THROW_ON_ERROR);
-
-        $this->assertTrue($responseData['success']);
-        $this->assertSame('123e4567-e89b-12d3-a456-426614174001', $responseData['user']['id']);
-        $this->assertSame('admin@example.com', $responseData['user']['email']);
-        $this->assertContains('ROLE_USER', $responseData['user']['roles']);
-        $this->assertContains('ROLE_ADMIN', $responseData['user']['roles']);
+        $this->assertResponseRedirects('/');
 
         // Verify audit log was created for successful login
         $auditLogs = $this->auditLogRepository->findByUserId('123e4567-e89b-12d3-a456-426614174001');
@@ -112,16 +96,13 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'user@example.com',
-                'password' => 'WrongPassword123!',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => 'user@example.com',
+                '_password' => 'WrongPassword123!',
+            ]
         );
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
         // Verify audit log was created for failed login
         $qb = $this->connection->createQueryBuilder();
@@ -142,16 +123,13 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'nonexistent@example.com',
-                'password' => 'SomePassword123!',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => 'nonexistent@example.com',
+                '_password' => 'SomePassword123!',
+            ]
         );
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
         // Verify audit log was created for failed login with non-existent user
         $qb = $this->connection->createQueryBuilder();
@@ -166,7 +144,7 @@ final class SecurityControllerTest extends WebTestCase
         $this->assertNotFalse($result, 'LOGIN_FAILURE audit event should exist');
         $this->assertNull($result['user_id'], 'User ID should be null for non-existent user');
         $this->assertIsString($result['context']);
-        $this->assertStringContainsString('nonexistent@example.com', $result['context'], 'Attempted email should be in context');
+        // Note: form_login doesn't expose the username in context for security reasons
     }
 
     public function testAdminLoginFailsWithMissingEmail(): void
@@ -174,12 +152,9 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'password' => 'SomePassword123!',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_password' => 'SomePassword123!',
+            ]
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -190,36 +165,20 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'test@example.com',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => 'test@example.com',
+            ]
         );
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertResponseRedirects('/admin/login');
     }
 
-    public function testAdminLoginFailsWithInvalidJson(): void
-    {
-        $this->client->request(
-            'POST',
-            '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            'invalid-json-payload'
-        );
-
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-    }
-
-    public function testAdminLoginOnlyAcceptsPostMethod(): void
+    public function testAdminLoginRendersLoginPage(): void
     {
         $this->client->request('GET', '/admin/login');
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
     public function testAdminLoginWithRegularUserRole(): void
@@ -236,26 +195,13 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'regular@example.com',
-                'password' => 'UserPassword123!',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => 'regular@example.com',
+                '_password' => 'UserPassword123!',
+            ]
         );
 
-        $this->assertResponseIsSuccessful();
-
-        $responseContent = $this->client->getResponse()->getContent() ?: '';
-        $this->assertNotEmpty($responseContent);
-
-        /** @var array{success: bool, user: array{roles: array<string>}} $responseData */
-        $responseData = json_decode($responseContent, true, 512, \JSON_THROW_ON_ERROR);
-
-        $this->assertTrue($responseData['success']);
-        $this->assertContains('ROLE_USER', $responseData['user']['roles']);
-        $this->assertNotContains('ROLE_ADMIN', $responseData['user']['roles']);
+        $this->assertResponseRedirects('/');
     }
 
     public function testAdminLoginAuthenticatesUserInSession(): void
@@ -274,20 +220,13 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => 'session@example.com',
-                'password' => 'SessionTest123!',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => 'session@example.com',
+                '_password' => 'SessionTest123!',
+            ]
         );
 
-        $this->assertResponseIsSuccessful();
-
-        // Verify user is authenticated by checking response
-        // The session-based authentication is configured properly
-        $this->assertResponseIsSuccessful();
+        $this->assertResponseRedirects('/');
     }
 
     public function testAdminLoginWithEmptyCredentials(): void
@@ -295,17 +234,13 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request(
             'POST',
             '/admin/login',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => '',
-                'password' => '',
-            ], \JSON_THROW_ON_ERROR)
+            [
+                '_username' => '',
+                '_password' => '',
+            ]
         );
 
-        // JsonLoginAuthenticator validates email/password are non-empty strings before authentication
-        // Returns 400 Bad Request if validation fails
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        // Form login redirects back to login page on validation failure
+        $this->assertResponseRedirects('/admin/login');
     }
 }

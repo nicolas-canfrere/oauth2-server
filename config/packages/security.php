@@ -37,10 +37,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
                 'lazy' => true,
                 'stateless' => false,
                 'provider' => 'app_user_provider',
-                'json_login' => [
+                'form_login' => [
+                    'login_path' => 'admin_login',
                     'check_path' => 'admin_login',
-                    'username_path' => 'email',
-                    'password_path' => 'password',
                 ],
                 'logout' => [
                     'path' => 'admin_logout',
