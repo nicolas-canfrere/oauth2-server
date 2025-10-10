@@ -67,4 +67,11 @@ interface UserRepositoryInterface
      * @return bool True if deletion was successful, false otherwise
      */
     public function delete(string $id): bool;
+
+    /**
+     * Check if at least one user with ROLE_ADMIN exists.
+     *
+     * @return bool True if an admin user exists, false otherwise
+     */
+    public function adminExists(): bool;
 }

@@ -202,6 +202,36 @@ final class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function adminExists(): bool
+    {
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder
+            ->select('COUNT(*) as count')
+            ->from(self::TABLE_NAME)
+            ->where('roles::jsonb @> :adminRole')
+            ->setParameter('adminRole', json_encode(['ROLE_ADMIN'], JSON_THROW_ON_ERROR));
+
+        try {
+            /** @var array{count: int}|false $result */
+            $result = $queryBuilder->executeQuery()->fetchAssociative();
+
+            if (false === $result) {
+                return false;
+            }
+
+            return $result['count'] > 0;
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to check if admin exists: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
+        }
+    }
+
+    /**
      * Hydrate User from database row.
      *
      * @param array<string, mixed> $row Database row
