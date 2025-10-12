@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:user:create', description: 'Create a new user')]
+#[AsCommand(name: 'oauth2:user:create', description: 'Create a new user')]
 final class CreateUserCommand extends Command
 {
     public function __construct(

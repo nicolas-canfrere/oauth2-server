@@ -70,3 +70,6 @@ test:
 ##@ OAuth utils
 key-generate: ## generate key pair. R one of rsa, ecdsa
 	$(DOCKER_COMPOSE_RUN) php bin/console oauth2:key:generate $(R)
+
+admin-generate: ## generate quickly first admin user
+	$(DOCKER_COMPOSE_RUN) php bin/console oauth2:user:create --email=admin@example.org --password=admin --role=ROLE_ADMIN
