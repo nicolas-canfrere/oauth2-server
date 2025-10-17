@@ -70,4 +70,23 @@ interface ClientRepositoryInterface
      * @return list<OAuthClient> Array of client objects
      */
     public function findAll(int $limit = 100, int $offset = 0): array;
+
+    /**
+     * Paginate OAuth2 clients with flexible ordering.
+     *
+     * Supports sorting by multiple fields with whitelist validation for SQL injection prevention.
+     * Pagination parameters are validated to ensure reasonable resource usage.
+     *
+     * Allowed sortable fields: 'name', 'client_id', 'created_at', 'id'
+     *
+     * @param int    $page         Current page number (1-indexed, minimum: 1)
+     * @param int    $itemsPerPage Number of items per page (minimum: 1, maximum: 100)
+     * @param string $orderBy      Order direction: 'asc' or 'desc' (default: 'asc')
+     * @param string $sortField    Field to sort by (default: 'name')
+     *
+     * @return array{clients: OAuthClient[], total: int, page: int, itemsPerPage: int, totalPages: int}
+     *
+     * @throws \RuntimeException If database operation fails
+     */
+    public function paginate(int $page, int $itemsPerPage, string $orderBy = 'asc', string $sortField = 'name'): array;
 }

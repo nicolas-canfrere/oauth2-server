@@ -208,6 +208,99 @@ final class ClientRepository implements ClientRepositoryInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function paginate(int $page, int $itemsPerPage, string $orderBy = 'asc', string $sortField = 'name'): array
+    {
+        // Validate all inputs before any database operations (prevents division by zero)
+        if ($page < 1) {
+            throw new \InvalidArgumentException('Page must be greater than or equal to 1.');
+        }
+
+        if ($itemsPerPage < 1) {
+            throw new \InvalidArgumentException('Items per page must be greater than or equal to 1.');
+        }
+
+        // Validate and normalize order direction
+        $orderBy = strtolower($orderBy);
+        if (!\in_array($orderBy, ['asc', 'desc'], true)) {
+            throw new \InvalidArgumentException('Invalid order direction. Must be "asc" or "desc".');
+        }
+
+        // Validate sort field against whitelist (prevents SQL injection)
+        $allowedFields = ['name', 'client_id', 'created_at', 'id'];
+        if (!\in_array($sortField, $allowedFields, true)) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid sort field "%s". Allowed fields: %s', $sortField, implode(', ', $allowedFields))
+            );
+        }
+
+        try {
+            /*
+             * Performance Note: COUNT(*) Query Optimization
+             *
+             * The COUNT(*) query performs a full table scan on PostgreSQL for large tables.
+             * This is acceptable for tables with < 100k rows but may become a bottleneck beyond that.
+             *
+             * Optimization options if performance degrades:
+             * 1. Use PostgreSQL's pg_class.reltuples for approximate count:
+             *    SELECT reltuples::bigint FROM pg_class WHERE relname = 'oauth_clients'
+             * 2. Implement caching for total count with short TTL (e.g., 5-10 minutes)
+             * 3. Switch to cursor-based pagination (keyset pagination) for very large datasets
+             * 4. Consider showing only "Next/Previous" without total count/pages
+             *
+             * Current decision: Use exact COUNT(*) for accuracy and simplicity.
+             * Monitor performance and optimize if measured necessary (>100ms query time).
+             */
+            $countQueryBuilder = $this->connection->createQueryBuilder();
+            $countQueryBuilder
+                ->select('COUNT(*) as count')
+                ->from(self::TABLE_NAME);
+
+            /** @var array{count: int|numeric-string}|false $countResult */
+            $countResult = $countQueryBuilder->executeQuery()->fetchAssociative();
+
+            if (false === $countResult) {
+                $total = 0;
+            } else {
+                $total = (int) $countResult['count'];
+            }
+
+            // Calculate offset and total pages
+            $offset = ($page - 1) * $itemsPerPage;
+            $totalPages = (int) ceil($total / $itemsPerPage);
+
+            // Fetch clients with pagination
+            $queryBuilder = $this->connection->createQueryBuilder();
+            $queryBuilder
+                ->select('*')
+                ->from(self::TABLE_NAME)
+                ->orderBy($sortField, $orderBy)
+                ->setMaxResults($itemsPerPage)
+                ->setFirstResult($offset);
+
+            $results = $queryBuilder->executeQuery()->fetchAllAssociative();
+
+            // Hydrate clients
+            $clients = array_map(fn(array $row): OAuthClient => $this->hydrateClient($row), $results);
+
+            return [
+                'clients' => $clients,
+                'total' => $total,
+                'page' => $page,
+                'itemsPerPage' => $itemsPerPage,
+                'totalPages' => $totalPages,
+            ];
+        } catch (Exception $exception) {
+            throw new RepositoryException(
+                sprintf('Failed to paginate OAuth2 clients: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
+        }
+    }
+
+    /**
      * Hydrate OAuthClient from database row.
      *
      * @param array<string, mixed> $row Database row
