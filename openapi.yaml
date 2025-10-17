@@ -1,0 +1,376 @@
+openapi: 3.0.0
+info:
+  title: 'My App'
+  description: 'This is an awesome app!'
+  version: 1.0.0
+paths:
+  /api/resource:
+    get:
+      summary: 'Example: Global API endpoint with IP-based rate limiting.'
+      description: "Rate limit: 100 requests per minute per IP\nStrategy: Sliding window\nNote: Whitelisted IPs are automatically bypassed"
+      operationId: get_api_resource
+      responses:
+        default:
+          description: ''
+  /api/protected:
+    post:
+      summary: 'Example: Combined rate limiting (multiple limiters).'
+      description: 'This endpoint checks both client_id and global IP rate limits.'
+      operationId: post_api_protected
+      responses:
+        default:
+          description: ''
+  /api/graceful:
+    get:
+      summary: 'Example: Graceful rate limit handling without throwing exception.'
+      description: 'Instead of throwing an exception, return a custom response.'
+      operationId: get_api_graceful
+      responses:
+        default:
+          description: ''
+  /api/clients:
+    get:
+      tags:
+        - 'OAuth Clients'
+      summary: 'List OAuth clients with pagination and sorting'
+      operationId: get_api_clients_list
+      parameters:
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 0
+            exclusiveMinimum: true
+        -
+          name: itemsPerPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+            minimum: 0
+            exclusiveMinimum: true
+        -
+          name: orderBy
+          in: query
+          required: false
+          schema:
+            type: string
+            default: asc
+            enum:
+              - asc
+              - desc
+        -
+          name: sortField
+          in: query
+          required: false
+          schema:
+            type: string
+            default: name
+            enum:
+              - name
+              - client_id
+              - created_at
+              - id
+      responses:
+        '200':
+          description: 'Returns paginated list of OAuth clients'
+          content:
+            application/json:
+              schema:
+                properties:
+                  clients: { type: array, items: { properties: { id: { type: string, format: uuid, example: 550e8400-e29b-41d4-a716-446655440000 }, client_id: { type: string, example: my-app-client }, name: { type: string, example: 'My Application' }, redirect_uri: { type: string, format: uri, example: 'https://example.com/callback' }, grant_types: { type: array, items: { type: string }, example: [authorization_code, refresh_token] }, scopes: { type: array, items: { type: string }, example: [read, write] }, is_confidential: { type: boolean, example: true }, pkce_required: { type: boolean, example: false }, created_at: { type: string, format: date-time, example: '2025-10-17T10:30:00+00:00' }, updated_at: { type: string, format: date-time, example: '2025-10-17T12:45:00+00:00', nullable: true } }, type: object } }
+                  pagination: { $ref: '#/components/schemas/PaginationMeta' }
+                type: object
+        '400':
+          description: 'Invalid query parameters'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Validation failed' }
+                type: object
+      security:
+        -
+          Bearer: []
+    post:
+      tags:
+        - 'OAuth Clients'
+      summary: 'Create a new OAuth client'
+      operationId: post_api_oauth_clients_create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOAuthClientDTO'
+      responses:
+        '201':
+          description: 'OAuth client created successfully'
+          content:
+            application/json:
+              schema:
+                properties:
+                  client_id: { type: string, example: my-app-client }
+                  client_secret: { type: string, example: secret_abc123xyz }
+                  name: { type: string, example: 'My Application' }
+                  redirect_uris: { type: array, items: { type: string, format: uri }, example: ['https://example.com/callback'] }
+                  grant_types: { type: array, items: { type: string }, example: [authorization_code, refresh_token] }
+                  scopes: { type: array, items: { type: string }, example: [read, write] }
+                  is_confidential: { type: boolean, example: true }
+                  pkce_required: { type: boolean, example: false }
+                type: object
+        '400':
+          description: 'Invalid request data'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Validation failed' }
+                type: object
+      security:
+        -
+          Bearer: []
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: 'List users with pagination and sorting'
+      operationId: get_api_users_list
+      parameters:
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 0
+            exclusiveMinimum: true
+        -
+          name: itemsPerPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+            minimum: 0
+            exclusiveMinimum: true
+        -
+          name: orderBy
+          in: query
+          required: false
+          schema:
+            type: string
+            default: asc
+            enum:
+              - asc
+              - desc
+        -
+          name: sortField
+          in: query
+          required: false
+          schema:
+            type: string
+            default: email
+            enum:
+              - email
+              - created_at
+              - id
+      responses:
+        '200':
+          description: 'Returns paginated list of users'
+          content:
+            application/json:
+              schema:
+                properties:
+                  users: { type: array, items: { properties: { id: { type: string, format: uuid, example: 550e8400-e29b-41d4-a716-446655440000 }, email: { type: string, format: email, example: user@example.com }, roles: { type: array, items: { type: string }, example: [ROLE_USER] }, is_2fa_enabled: { type: boolean, example: false }, created_at: { type: string, format: date-time, example: '2025-10-17T10:30:00+00:00' }, updated_at: { type: string, format: date-time, example: '2025-10-17T12:45:00+00:00', nullable: true } }, type: object } }
+                  pagination: { $ref: '#/components/schemas/PaginationMeta' }
+                type: object
+        '400':
+          description: 'Invalid query parameters'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Validation failed' }
+                type: object
+      security:
+        -
+          Bearer: []
+components:
+  schemas:
+    PaginationMeta:
+      properties:
+        total:
+          description: 'Total number of items'
+          type: integer
+          example: 42
+        page:
+          description: 'Current page number'
+          type: integer
+          example: 1
+        items_per_page:
+          description: 'Number of items per page'
+          type: integer
+          example: 10
+        total_pages:
+          description: 'Total number of pages'
+          type: integer
+          example: 5
+      type: object
+    CreateOAuthClientDTO:
+      required:
+        - name
+        - isConfidential
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+        redirectUris:
+          type: array
+          items:
+            type: string
+          default: []
+          minItems: 1
+        grantTypes:
+          type: array
+          items:
+            type: string
+          default:
+            - authorization_code
+          minItems: 1
+        scopes:
+          type: array
+          items:
+            type: string
+          default: []
+        isConfidential:
+          type: boolean
+        pkceRequired:
+          type: boolean
+          default: true
+        clientId:
+          type: string
+          default: null
+          nullable: true
+        clientSecret:
+          type: string
+          default: null
+          nullable: true
+      type: object
+    ListOAuthClientsQueryDTO:
+      properties:
+        page:
+          type: integer
+          default: 1
+          minimum: 0
+          exclusiveMinimum: true
+        itemsPerPage:
+          type: integer
+          default: 10
+          maximum: 100
+          minimum: 0
+          exclusiveMinimum: true
+        orderBy:
+          type: string
+          default: asc
+          enum:
+            - asc
+            - desc
+        sortField:
+          type: string
+          default: name
+          enum:
+            - name
+            - client_id
+            - created_at
+            - id
+      type: object
+    ListUsersQueryDTO:
+      properties:
+        page:
+          type: integer
+          default: 1
+          minimum: 0
+          exclusiveMinimum: true
+        itemsPerPage:
+          type: integer
+          default: 10
+          maximum: 100
+          minimum: 0
+          exclusiveMinimum: true
+        orderBy:
+          type: string
+          default: asc
+          enum:
+            - asc
+            - desc
+        sortField:
+          type: string
+          default: email
+          enum:
+            - email
+            - created_at
+            - id
+      type: object
+  parameters:
+    page:
+      name: page
+      in: query
+      description: 'Current page number (1-indexed)'
+      required: false
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    itemsPerPage:
+      name: itemsPerPage
+      in: query
+      description: 'Number of items per page'
+      required: false
+      schema:
+        type: integer
+        default: 10
+        maximum: 100
+        minimum: 1
+    orderBy:
+      name: orderBy
+      in: query
+      description: 'Sort direction'
+      required: false
+      schema:
+        type: string
+        default: asc
+        enum:
+          - asc
+          - desc
+    sortField:
+      name: sortField
+      in: query
+      description: 'Field to sort by'
+      required: false
+      schema:
+        type: string
+  securitySchemes:
+    Bearer:
+      type: http
+      bearerFormat: JWT
+      scheme: bearer
+security:
+  -
+    Bearer: []
+tags:
+  -
+    name: 'OAuth Clients'
+    description: 'OAuth Clients'
+  -
+    name: Users
+    description: Users
+

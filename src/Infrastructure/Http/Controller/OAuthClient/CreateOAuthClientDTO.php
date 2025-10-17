@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Application\OAuthClient\CreateOAuthClient;
+namespace App\Infrastructure\Http\Controller\OAuthClient;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Application\OAuthClient\CreateOAuthClient;
 
-use App\Application\OAuthClient\CreateOAuthClient\CreateOAuthClientDTO;
+use App\Infrastructure\Http\Controller\OAuthClient\CreateOAuthClientDTO;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @covers \App\Application\OAuthClient\CreateOAuthClient\CreateOAuthClientDTO
+ * @covers \App\Infrastructure\Http\Controller\OAuthClient\CreateOAuthClientDTO
  */
 final class CreateOAuthClientDTOTest extends KernelTestCase
 {

@@ -6,6 +6,8 @@ namespace App\Infrastructure\Http\Controller\OAuthClient;
 
 use App\Application\OAuthClient\ListOAuthClient\ListOAuthClientQuery;
 use App\Application\OAuthClient\ListOAuthClient\ListOAuthClientQueryHandler;
+use Nelmio\ApiDocBundle\Attribute\Security;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +27,55 @@ final class ListOAuthClientsController extends AbstractController
     /**
      * List OAuth clients with pagination and sorting.
      */
+    #[OA\Get(
+        path: '/api/clients',
+        summary: 'List OAuth clients with pagination and sorting',
+        tags: ['OAuth Clients']
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns paginated list of OAuth clients',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'clients',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(property: 'id', type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000'),
+                            new OA\Property(property: 'client_id', type: 'string', example: 'my-app-client'),
+                            new OA\Property(property: 'name', type: 'string', example: 'My Application'),
+                            new OA\Property(property: 'redirect_uri', type: 'string', format: 'uri', example: 'https://example.com/callback'),
+                            new OA\Property(property: 'grant_types', type: 'array', items: new OA\Items(type: 'string'), example: ['authorization_code', 'refresh_token']),
+                            new OA\Property(property: 'scopes', type: 'array', items: new OA\Items(type: 'string'), example: ['read', 'write']),
+                            new OA\Property(property: 'is_confidential', type: 'boolean', example: true),
+                            new OA\Property(property: 'pkce_required', type: 'boolean', example: false),
+                            new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2025-10-17T10:30:00+00:00'),
+                            new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2025-10-17T12:45:00+00:00', nullable: true),
+                        ],
+                        type: 'object'
+                    )
+                ),
+                new OA\Property(
+                    property: 'pagination',
+                    ref: '#/components/schemas/PaginationMeta',
+                    type: 'object'
+                ),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Invalid query parameters',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', type: 'string', example: 'Validation failed'),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Security(name: 'Bearer')]
     #[Route('/api/clients', name: 'api_clients_list', methods: ['GET'])]
     public function __invoke(
         #[MapQueryString(

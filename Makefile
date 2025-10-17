@@ -67,6 +67,11 @@ test:
 	$(DOCKER_COMPOSE_RUN) php-test ./bin/phpunit $(R)
 	docker compose -f $(DOCKER_COMPOSE_FILE) down -v
 
+##@ Documentation
+
+openapi:
+	$(DOCKER_COMPOSE_RUN) --no-deps php bin/console nelmio:apidoc:dump --format=yaml > openapi.yaml
+
 ##@ OAuth utils
 key-generate: ## generate key pair. R one of rsa, ecdsa
 	$(DOCKER_COMPOSE_RUN) php bin/console oauth2:key:generate $(R)

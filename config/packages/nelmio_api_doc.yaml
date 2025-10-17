@@ -1,0 +1,73 @@
+nelmio_api_doc:
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+    documentation:
+        info:
+            title: My App
+            description: This is an awesome app!
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+            schemas:
+                PaginationMeta:
+                    type: object
+                    properties:
+                        total:
+                            type: integer
+                            description: Total number of items
+                            example: 42
+                        page:
+                            type: integer
+                            description: Current page number
+                            example: 1
+                        items_per_page:
+                            type: integer
+                            description: Number of items per page
+                            example: 10
+                        total_pages:
+                            type: integer
+                            description: Total number of pages
+                            example: 5
+            parameters:
+                page:
+                    name: page
+                    in: query
+                    description: Current page number (1-indexed)
+                    required: false
+                    schema:
+                        type: integer
+                        default: 1
+                        minimum: 1
+                itemsPerPage:
+                    name: itemsPerPage
+                    in: query
+                    description: Number of items per page
+                    required: false
+                    schema:
+                        type: integer
+                        default: 10
+                        minimum: 1
+                        maximum: 100
+                orderBy:
+                    name: orderBy
+                    in: query
+                    description: Sort direction
+                    required: false
+                    schema:
+                        type: string
+                        default: asc
+                        enum: [asc, desc]
+                sortField:
+                    name: sortField
+                    in: query
+                    description: Field to sort by
+                    required: false
+                    schema:
+                        type: string
+        security:
+            - Bearer: [ ]

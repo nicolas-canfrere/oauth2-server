@@ -46,7 +46,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
                 ],
             ],
             'api' => [
-                'pattern' => '^/api',
+                'pattern' => '^/api(?!/doc\.json$)',
                 'stateless' => true,
                 'provider' => 'app_user_provider',
             ],
