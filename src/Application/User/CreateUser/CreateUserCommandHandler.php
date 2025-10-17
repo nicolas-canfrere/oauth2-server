@@ -8,6 +8,7 @@ use App\Domain\Shared\Factory\IdentityFactoryInterface;
 use App\Domain\User\Model\User;
 use App\Domain\User\Repository\UserRepositoryInterface;
 use App\Domain\User\Service\UserPasswordHasherInterface;
+use App\Domain\User\UserAlreadyExistsException;
 
 final readonly class CreateUserCommandHandler
 {
@@ -37,7 +38,7 @@ final readonly class CreateUserCommandHandler
         }
 
         if (null !== $this->userRepository->findByEmail($normalizedEmail)) {
-            throw new \RuntimeException(sprintf('User with email "%s" already exists.', $normalizedEmail));
+            throw new UserAlreadyExistsException(sprintf('User with email "%s" already exists.', $normalizedEmail));
         }
 
         $passwordHash = $this->passwordHasher->hash($command->plainPassword);

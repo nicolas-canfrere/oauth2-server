@@ -203,6 +203,48 @@ paths:
       security:
         -
           Bearer: []
+    post:
+      tags:
+        - Users
+      summary: 'Create a new user'
+      operationId: post_api_users_create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDTO'
+      responses:
+        '201':
+          description: 'User created successfully'
+          content:
+            application/json:
+              schema:
+                properties:
+                  user_id: { type: string, format: uuid, example: 550e8400-e29b-41d4-a716-446655440000 }
+                  email: { type: string, format: email, example: user@example.com }
+                  roles: { type: array, items: { type: string }, example: [ROLE_USER] }
+                  is_two_factor_enabled: { type: boolean, example: false }
+                type: object
+        '400':
+          description: 'Invalid request data'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Validation failed' }
+                type: object
+        '409':
+          description: 'User already exists'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'User with email "user@example.com" already exists.' }
+                type: object
+      security:
+        -
+          Bearer: []
 components:
   schemas:
     PaginationMeta:
@@ -292,6 +334,30 @@ components:
             - client_id
             - created_at
             - id
+      type: object
+    CreateUserDTO:
+      required:
+        - email
+        - password
+        - isTwoFactorEnabled
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          minLength: 8
+        roles:
+          type: array
+          items:
+            type: string
+          default:
+            - ROLE_USER
+        isTwoFactorEnabled:
+          type: boolean
+        totpSecret:
+          type: string
+          default: null
+          nullable: true
       type: object
     ListUsersQueryDTO:
       properties:
