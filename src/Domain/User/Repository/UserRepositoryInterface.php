@@ -74,4 +74,18 @@ interface UserRepositoryInterface
      * @return bool True if an admin user exists, false otherwise
      */
     public function adminExists(): bool;
+
+    /**
+     * Paginate users with optional ordering.
+     *
+     * @param int    $page         Current page (1-indexed)
+     * @param int    $itemsPerPage Number of items per page
+     * @param string $orderBy      Order direction: 'asc' or 'desc'
+     * @param string $sortField    Field to sort by: 'email', 'created_at', or 'id'
+     *
+     * @return array{users: User[], total: int, page: int, itemsPerPage: int, totalPages: int}
+     *
+     * @throws \RuntimeException If pagination fails
+     */
+    public function paginate(int $page, int $itemsPerPage, string $orderBy = 'asc', string $sortField = 'email'): array;
 }
