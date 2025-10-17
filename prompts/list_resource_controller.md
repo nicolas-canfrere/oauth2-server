@@ -15,7 +15,7 @@ Avant de créer le contrôleur, assurez-vous que les éléments suivants existen
 
 ```
 src/Infrastructure/Http/Controller/{Resource}/
-├── List{Resources}Controller.php      # Contrôleur principal
+├── List{Resources}Controller.php      # Contrôleur principal avec documentation OpenAPI
 └── List{Resources}QueryDTO.php        # DTO pour validation des query params
 ```
 
@@ -93,6 +93,8 @@ namespace App\Infrastructure\Http\Controller\{Resource};
 
 use App\Application\{Resource}\List{Resource}\List{Resource}Query;
 use App\Application\{Resource}\List{Resource}\List{Resource}QueryHandler;
+use Nelmio\ApiDocBundle\Attribute\Security;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,6 +114,47 @@ final class List{Resources}Controller extends AbstractController
     /**
      * List {resources} with pagination and sorting.
      */
+    #[OA\Get(
+        path: '/api/{resources}',
+        summary: 'List {resources} with pagination and sorting',
+        tags: ['{Resources}']
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns paginated list of {resources}',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: '{resources}',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(property: 'id', type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000'),
+                            // Add other properties based on your domain model
+                        ],
+                        type: 'object'
+                    )
+                ),
+                new OA\Property(
+                    property: 'pagination',
+                    ref: '#/components/schemas/PaginationMeta',
+                    type: 'object'
+                ),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Invalid query parameters',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', type: 'string', example: 'Validation failed'),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Security(name: 'Bearer')]
     #[Route('/api/{resources}', name: 'api_{resources}_list', methods: ['GET'])]
     public function __invoke(
         #[MapQueryString(
@@ -154,6 +197,22 @@ final class List{Resources}Controller extends AbstractController
 5. **Mapper les champs du modèle** dans le `array_map` selon les propriétés de votre modèle de domaine
 6. **Adapter l'URL de la route** : `/api/users`, `/api/clients`, `/api/tokens`
 7. **Adapter le nom de la route** : `api_users_list`, `api_clients_list`
+8. **Documenter les propriétés OpenAPI** : Ajouter toutes les propriétés du modèle de domaine dans `OA\Property`
+
+### Documentation OpenAPI
+
+Les attributs OpenAPI (`#[OA\*]`) génèrent automatiquement la documentation API :
+
+**Attributs à personnaliser** :
+- `#[OA\Get]` : URL, summary et tag de l'endpoint
+- `#[OA\Property]` dans `OA\Response` : Liste complète des champs retournés avec types et exemples
+- `#[Security(name: 'Bearer')]` : Authentification JWT requise
+
+**Points importants** :
+- Les paramètres de requête (`page`, `itemsPerPage`, `orderBy`, `sortField`) sont auto-documentés par `MapQueryString`
+- Le schéma `PaginationMeta` est réutilisé via `ref: '#/components/schemas/PaginationMeta'`
+- Pas besoin de documenter manuellement les query parameters, le DTO s'en charge
+- Ajouter tous les champs du modèle dans `OA\Property` avec leur type OpenAPI correspondant
 
 ### Mapping des champs (exemples)
 
@@ -185,7 +244,27 @@ final class List{Resources}Controller extends AbstractController
 
 **Pour des valeurs nullables** : Utiliser l'opérateur null-safe `?->` : `$item->updatedAt?->format(\DateTimeInterface::ATOM)`
 
-## Étape 3 : Vérifier la qualité du code
+## Étape 3 : Générer la documentation OpenAPI
+
+### Commande
+
+```bash
+# Générer le fichier openapi.yaml
+make openapi
+```
+
+Cette commande génère le fichier `openapi.yaml` à la racine du projet avec la documentation complète de l'API.
+
+### Vérification
+
+Vérifiez que l'endpoint apparaît correctement dans `openapi.yaml` avec :
+- Les query parameters documentés automatiquement depuis le DTO
+- La réponse 200 avec la structure complète
+- La réponse 400 pour les erreurs de validation
+- La sécurité Bearer appliquée
+- Le schéma `PaginationMeta` référencé
+
+## Étape 4 : Vérifier la qualité du code
 
 ### Commandes à exécuter
 
@@ -208,7 +287,7 @@ make static-code-analysis
 **Erreur PHPStan** : Type mismatch dans le mapping
 - **Solution** : Vérifier que les types retournés correspondent au format JSON attendu (string, int, bool, array)
 
-## Étape 4 : Tester l'endpoint
+## Étape 5 : Tester l'endpoint
 
 ### Requête de base
 
@@ -301,14 +380,64 @@ Le DTO valide les contraintes HTTP, puis les données sont passées à la Query 
 
 - [ ] DTO créé avec contraintes de validation appropriées
 - [ ] Contrôleur créé avec `MapQueryString`
+- [ ] Documentation OpenAPI ajoutée avec attributs `#[OA\*]`
+- [ ] Toutes les propriétés du modèle documentées dans `OA\Property`
+- [ ] `PaginationMeta` référencé via `ref: '#/components/schemas/PaginationMeta'`
+- [ ] Sécurité Bearer configurée avec `#[Security(name: 'Bearer')]`
 - [ ] Mapping des champs du domaine vers JSON complet
 - [ ] Route configurée avec bon path et nom
 - [ ] Dates formatées avec `\DateTimeInterface::ATOM`
 - [ ] Valeurs nullables gérées avec `?->`
+- [ ] `make openapi` exécuté et documentation vérifiée dans `openapi.yaml`
 - [ ] `make apply-cs` exécuté et passé
 - [ ] `make static-code-analysis` exécuté et passé
 - [ ] Endpoint testé manuellement avec curl
 - [ ] Validation des erreurs testée (page=0, itemsPerPage=101, etc.)
+
+## Types OpenAPI et correspondances
+
+### Mapping PHP → OpenAPI
+
+| Type PHP | Type OpenAPI | Format | Exemple |
+|----------|--------------|--------|---------|
+| `string` | `type: 'string'` | - | `example: 'John Doe'` |
+| `string` (UUID) | `type: 'string'` | `format: 'uuid'` | `example: '550e8400-e29b...'` |
+| `string` (email) | `type: 'string'` | `format: 'email'` | `example: 'user@example.com'` |
+| `string` (URI) | `type: 'string'` | `format: 'uri'` | `example: 'https://example.com'` |
+| `int` | `type: 'integer'` | - | `example: 42` |
+| `float` | `type: 'number'` | - | `example: 3.14` |
+| `bool` | `type: 'boolean'` | - | `example: true` |
+| `DateTimeImmutable` | `type: 'string'` | `format: 'date-time'` | `example: '2025-10-17T10:30:00+00:00'` |
+| `array<string>` | `type: 'array'` | `items: new OA\Items(type: 'string')` | `example: ['read', 'write']` |
+| `?string` (nullable) | `type: 'string'` | `nullable: true` | `example: null` |
+
+### Exemples de propriétés OpenAPI
+
+```php
+// String simple
+new OA\Property(property: 'name', type: 'string', example: 'John Doe')
+
+// UUID
+new OA\Property(property: 'id', type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000')
+
+// Email
+new OA\Property(property: 'email', type: 'string', format: 'email', example: 'user@example.com')
+
+// Integer
+new OA\Property(property: 'age', type: 'integer', example: 42)
+
+// Boolean
+new OA\Property(property: 'is_active', type: 'boolean', example: true)
+
+// DateTime
+new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2025-10-17T10:30:00+00:00')
+
+// Array de strings
+new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['ROLE_USER', 'ROLE_ADMIN'])
+
+// Nullable
+new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', nullable: true, example: null)
+```
 
 ## Exemple complet : User
 
